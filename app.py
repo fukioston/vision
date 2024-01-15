@@ -43,7 +43,7 @@ def get_direction():
 def get_size():
     eyes_detector = EyeDetector()
     while 1:
-        E_size = eyes_detector.Distance()  # 获得手的信息
+        E_size = eyes_detector.Distance()  # 获得字号大小
         if E_size is not None:
             data = {'E_size': E_size}
             print(data)
