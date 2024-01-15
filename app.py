@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, Response, jsonify, request
 import random
 import cv2 as cv2
 import mediapipe as mp
@@ -12,7 +12,7 @@ app = Flask(__name__)
 # 电脑自带摄像头
 @app.route("/")
 def index():
-    return render_template("index.html", rotation_angle=generate_rotation_angle, finger_director=get_direction)
+    return render_template("index.html")
 
 
 @app.route('/video_feed0')
@@ -37,6 +37,40 @@ def get_direction():
         if direction is not None:
             data = {'direction': direction}
             return jsonify(data)
+
+error_count = 0
+pre_size = -1
+best_vision = -1
+
+@app.route('/api/return', methods=['POST', 'GET'])
+def estimate_vision():
+    global pre_size
+    global error_count
+    global best_vision
+    data_received = request.json
+
+    current_size = data_received.get('distance')  # 注意此处使用正确的键名
+    true_or_wrong = data_received.get('answer')  # 注意此处使用正确的键名
+    print(current_size)
+    print(true_or_wrong)  # 注意此处使用正确的键名
+
+
+    if pre_size == -1:
+        pre_size = current_size
+
+    if error_count == 2:
+        data = {'best_vision': best_vision, 'exit': 1}
+    else:
+        if current_size == pre_size:
+            error_count += 1 if not true_or_wrong else 0
+            data = {'best_vision': best_vision, 'exit': 0}
+        else:
+            pre_size = current_size
+            pre_size_vision = (pre_size / 400) * 5.0
+            best_vision = pre_size_vision if best_vision < pre_size_vision else best_vision
+            data = {'best_vision': best_vision, 'exit': 0}
+
+    return jsonify(data)  # 使用jsonify函数返回JSON格式的Response对象
 
 
 if __name__ == '__main__':

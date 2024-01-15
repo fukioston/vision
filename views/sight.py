@@ -71,8 +71,6 @@ class HandDetector:
 
 
 detector_ = HandDetector()
-
-
 def gen_frames0(detector=detector_):
     while 1:
         direction = detector.findDirection()  # 获得手的信息
