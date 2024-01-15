@@ -34,16 +34,14 @@ class HandDetector:
 
         dirc = None
 
-        '''We cannot tell apart the hands on the screen, so we iterate it for every hand detected'''
         if self.results.multi_hand_landmarks:
             for myHand in self.results.multi_hand_landmarks:
 
-                '''landmark of MCP, PIP, and TIP of the index finger'''
+
                 lm_mcp = myHand.landmark[self.mpHands.HandLandmark.INDEX_FINGER_MCP]
                 lm_pip = myHand.landmark[self.mpHands.HandLandmark.INDEX_FINGER_PIP]
                 lm_tip = myHand.landmark[self.mpHands.HandLandmark.INDEX_FINGER_TIP]
 
-                '''the distance from PIP and TIP to MCP'''
                 dist_pip2mcp = math.hypot(lm_pip.x - lm_mcp.x,
                                           lm_pip.y - lm_mcp.y,
                                           lm_pip.z - lm_mcp.z)
@@ -126,7 +124,6 @@ detector_ = HandDetector()
 
 
 def gen_frames0(detector=detector_):
-    detector = HandDetector()
     while 1:
         direction = detector.findDirection()  # 获得手的信息
         if direction is not None:
@@ -137,5 +134,8 @@ def gen_frames0(detector=detector_):
         # 将缓存里的流数据转成字节流
         frame = buffer.tobytes()
         # 指定字节流类型image/jpeg
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        # yield (b'--frame\r\n'
+        #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+
