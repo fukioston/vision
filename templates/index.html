@@ -48,11 +48,7 @@
 </head>
 
 <body>
-    <h3>接收传输来的视频</h3>
-    <div class="container">
-        <img src="{{ url_for('video_feed0') }}" class="video-stream">
-        <img class="overlay">
-    </div>
+
 <!--显示视力表字母E-->
     <div id="vision-test">
         E
@@ -69,7 +65,7 @@
 
           // 使用Fetch API 发起GET请求
           function updateLetterDirection() {
-            var letterE = document.getElementById("letter-e");
+            var letterE = document.getElementById("vision-test");
 
             // 映射mediapipe返回的方向到字母 E 的方向
             var directionMap = {
@@ -80,9 +76,9 @@
             };
 
 
-            // 判断方向是否正确，并给出提示
-            console.log("media:",mediapipeDirection);
-            console.log("E:",E_direction);
+            // 判断方向是否正确,正确则修改修改方向
+            //console.log("media:", typeof mediapipeDirection, mediapipeDirection);
+            //console.log("E:", typeof E_direction, E_direction);
             if (mediapipeDirection === E_direction) {
                 //改变E的方向
                 fetch('/api/angle')
@@ -99,16 +95,38 @@
         }
 
         //根据捕捉的食指方向
+        var pre_time = new Date();
+        var end_time = new Date();
+        var temp = -1;
+
+        var directionCount = {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0
+        }
         setInterval(function () {
              fetch('/api/mediapipedirection')
                 .then(response => response.json())
                 .then(data => {
-                mediapipeDirection=data.direction;
-                console.log('data:',data.direction);
+                temp = data.direction;
+                directionCount[temp] += 1;
               })
              .catch(error => console.error('Error fetching direction:', error));
-             updateLetterDirection();
-        }, 1000); // 1000ms更新一次方向，实际应替换为适当的时间间隔
+            end_time = new Date();
+            if(end_time - pre_time >= 1000){
+                pre_time = end_time;
+                //以一秒内出现次数最多的方向为此次食指的方向
+                temp = Object.keys(directionCount).reduce((a, b) => directionCount[a] > directionCount[b] ? a : b);
+                mediapipeDirection = parseInt(temp, 10);
+                //字典值清零
+                directionCount[1] = 0;
+                directionCount[2] = 0;
+                directionCount[3] = 0;
+                directionCount[4] = 0;
+                updateLetterDirection();
+             }
+        }, 50); // 10ms更新一次方向，实际应替换为适当的时间间隔
     </script>
 
 </body>
