@@ -59,7 +59,7 @@
     <img src="{{url_for('video_feed0')}}" alt="" width="100%">
 </div>
 <!-- 显示分数 -->
-<div id="score-display">Score: 0</div>
+<div id="score-display">Score: 4.0</div>
 
 
 <script>
@@ -68,6 +68,19 @@
         var score=4.0;
         var error=0;
         var currentProgress = 0;
+        function  init(){
+            fetch('/api/mediapipedirection/size')
+        .then(response => response.json())
+        .then(data => {
+            const letterE = document.getElementById('vision-test');
+            letterE.style.fontSize = data.E_size + 'px';
+            {#    E_direction = data.E_size;#}
+            {#console.log(data); // 处理返回的数据#}
+            // 这里可以根据返回的数据更新页面
+        })
+        .catch(error => console.error('Error:', error));
+        }
+        init()
 function calculateFontSize(score) {
     // 基本字体大小，您可以根据需要调整
     var baseSize = 8;

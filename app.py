@@ -35,7 +35,7 @@ def generate_rotation_angle():
 def get_direction():
     while 1:
         direction = detector.findDirection()  # 获得手的信息
-        if direction is not None:
+        if direction:
             data = {'direction': direction}
             return jsonify(data)
 
@@ -44,7 +44,7 @@ def get_direction():
 def get_size():
     eyes_detector = EyeDetector()
     while 1:
-        E_size = eyes_detector.Distance()  # 获得字号大小
+        E_size = detector.Distance()  # 获得字号大小
         if E_size is not None:
             data = {'E_size': E_size}
             return jsonify(data)
