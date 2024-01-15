@@ -64,7 +64,7 @@
 
 <script>
         var mediapipeDirection = 0;
-        var E_direction = 3;
+        var E_direction = 8;
         var score=4.0;
         var error=0;
         var currentProgress = 0;
@@ -101,21 +101,22 @@ function updateProgressBar(percentage) {
 
             // 映射mediapipe返回的方向到字母 E 的方向
             var directionMap = {
-                1: 5,    // 右
-                2:6,  // 下
-                3: 8,  // 左
-                4: 9   // 上
+                5: 5,    // 右
+                6:6,  // 下
+                8: 8,  // 左
+                9: 9   // 上
             };
 
 
             // 判断方向是否正确,正确则修改修改方向
             //console.log("media:", typeof mediapipeDirection, mediapipeDirection);
             //console.log("E:", typeof E_direction, E_direction);
-            console.log(mediapipeDirection)
-              console.log(E_direction)
+            console.log("我测试"+mediapipeDirection)
+              console.log("我测试2"+E_direction)
+            {#  console.log(E_direction)#}
             if (mediapipeDirection === E_direction) {
                 //改变E的方向
-                fetch('/api/angle')
+                fetch('/api/number')
                 .then(response => response.json())
                 .then(data => {
                 score+=0.1;
@@ -123,8 +124,8 @@ function updateProgressBar(percentage) {
                 scoreDisplay.innerText = "Score: " + score.toFixed(1);
                 var fontSize = calculateFontSize(score);
                 letterE.style.fontSize = fontSize + 'px';
-                    E_direction = data.rotation_angle;
-                    letterE.innerText=directionMap[data.rotation_angle]
+                    E_direction = data.rand;
+                    letterE.innerText=directionMap[data.rand]
 
         })
         .catch(error => console.error('Error fetching angle:', error));
@@ -137,15 +138,16 @@ function updateProgressBar(percentage) {
         var temp = -1;
 
         var directionCount = {
-            1: 0,
-            2: 0,
-            3: 0,
-            4: 0
+            5: 0,
+            6: 0,
+            8: 0,
+            9: 0
         }
         setInterval(function () {
              fetch('/api/mediapipedirection2')
                 .then(response => response.json())
                 .then(data => {
+                    console.log(data.direction+'ss')
                 temp = data.direction;
                 directionCount[temp] += 1;
               })
@@ -157,10 +159,10 @@ function updateProgressBar(percentage) {
                 temp = Object.keys(directionCount).reduce((a, b) => directionCount[a] > directionCount[b] ? a : b);
                 mediapipeDirection = parseInt(temp, 10);
                 //字典值清零
-                directionCount[1] = 0;
-                directionCount[2] = 0;
-                directionCount[3] = 0;
-                directionCount[4] = 0;
+                directionCount[5] = 0;
+                directionCount[6] = 0;
+                directionCount[8] = 0;
+                directionCount[9] = 0;
                 updateLetterDirection();
              }
         }, 50); // 10ms更新一次方向，实际应替换为适当的时间间隔

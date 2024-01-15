@@ -11,23 +11,12 @@ from flask import jsonify
 BaseOptions = mp.tasks.BaseOptions
 GestureRecognizer = mp.tasks.vision.GestureRecognizer
 GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
-GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
 VisionRunningMode = mp.tasks.vision.RunningMode
 
-# Create a gesture recognizer instance with the live stream mode:
-def print_result(result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
-    if result.gestures:
-        t = result.gestures[0][0].category_name
-    else:
-        t = None
-
-    print("t:", t)
-    # print('gesture recognition result: {}'.format(result.gestures))
-
+# Create a gesture recognizer instance with the video mode:
 options = GestureRecognizerOptions(
     base_options=BaseOptions(model_asset_path='static/gesture_recognizer.task'),
-    running_mode=VisionRunningMode.LIVE_STREAM,
-    result_callback=print_result)
+    running_mode=VisionRunningMode.VIDEO)
 recognizer = GestureRecognizer.create_from_options(options)
 
 class HandDetector:
@@ -189,25 +178,24 @@ class EyeDetector:
 
 detector_ = HandDetector()
 def get_direction2():
+    # frame_count=detector_.timestamp
     while True:
-        # time.sleep(0.10)
-        data = {'direction': 6}
+        time.sleep(0.05)
         frame_count = detector_.timestamp
         success, frame = detector_.capture.read()
         imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # cv2图像初始化
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
-        recognition_result = recognizer.recognize_async(mp_image, frame_count)
+        recognition_result = recognizer.recognize_for_video(mp_image, frame_count)
+        # frame_count+=1
         detector_.timestamp += 1
-        # print(frame_count)
         # print(recognition_result)
         if recognition_result:
             if recognition_result.gestures:
                 t = recognition_result.gestures[0][0].category_name
             else:
                 t = None
-            print(t)
+            # print("test:"+t)
             if t:
-                print("test:"+t)
                 data = {'direction': t}
                 return jsonify(data)
 def gen_frames0(detector=detector_):

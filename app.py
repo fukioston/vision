@@ -36,6 +36,15 @@ def generate_rotation_angle():
     data = {'rotation_angle': rand}
     return jsonify(data)
 
+@app.route('/api/number', methods=['GET'])
+def generate_number():
+    options = [5, 6, 8, 9]
+
+    # 从列表中随机选择一个元素
+    rand = random.choice(options)
+    data = {'rand': rand}
+    return jsonify(data)
+
 
 @app.route('/api/mediapipedirection', methods=['GET'])
 def get_direction():
@@ -46,7 +55,7 @@ def get_direction():
             return jsonify(data)
 @app.route('/api/mediapipedirection2', methods=['GET'])
 def get_direction22():
-    get_direction2()
+    return get_direction2()
 
 error_count = 0
 pre_size = -1
