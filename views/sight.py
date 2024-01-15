@@ -1,6 +1,7 @@
 import cv2 as cv2
 import mediapipe as mp
 import math
+from cvzone.FaceMeshModule import FaceMeshDetector
 import random
 import numpy
 
@@ -8,7 +9,12 @@ import numpy
 class HandDetector:
 
     def __init__(self):
-
+        self.my_eyes = mp.solutions.face_mesh
+        self.eyes = self.my_eyes.FaceMesh(static_image_mode=True,
+                                          max_num_faces=1,
+                                          refine_landmarks=True,
+                                          min_detection_confidence=0.5,
+                                          min_tracking_confidence=0.5)
         self.mpHands = mp.solutions.hands  # 初始化手部追踪模块
         self.hands = self.mpHands.Hands(static_image_mode=False,  # 初始化手部追踪对象
                                         max_num_hands=2,
@@ -33,16 +39,14 @@ class HandDetector:
 
         dirc = None
 
-        '''We cannot tell apart the hands on the screen, so we iterate it for every hand detected'''
         if self.results.multi_hand_landmarks:
             for myHand in self.results.multi_hand_landmarks:
 
-                '''landmark of MCP, PIP, and TIP of the index finger'''
+
                 lm_mcp = myHand.landmark[self.mpHands.HandLandmark.INDEX_FINGER_MCP]
                 lm_pip = myHand.landmark[self.mpHands.HandLandmark.INDEX_FINGER_PIP]
                 lm_tip = myHand.landmark[self.mpHands.HandLandmark.INDEX_FINGER_TIP]
 
-                '''the distance from PIP and TIP to MCP'''
                 dist_pip2mcp = math.hypot(lm_pip.x - lm_mcp.x,
                                           lm_pip.y - lm_mcp.y,
                                           lm_pip.z - lm_mcp.z)
@@ -68,6 +72,94 @@ class HandDetector:
                         dirc = 4
 
         return dirc
+    def Distance(self):
+        face_mesh = self.my_eyes.FaceMesh()
+
+        # 读取帧
+        ret, frame = self.capture.read()
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        detector = FaceMeshDetector(maxFaces=1)  # 最多检测一张脸
+
+        img, faces = detector.findFaceMesh(frame, draw=False)  # 不绘制关键点
+
+        # 进行面部追踪
+        self.results = face_mesh.process(rgb_frame)
+
+        if self.results.multi_face_landmarks:
+
+            if faces:
+                face = faces[0]  # faces是三维列表，我们只需要第一张脸的所有关键点
+                # 获取瞳孔的坐标
+                left_eye = tuple(face[145])  # 左眼关键点坐标
+                right_eye = tuple(face[374])  # 右眼坐标
+
+                # 在图像上绘制瞳孔
+                cv2.circle(frame, left_eye, 5, (0, 255, 255), cv2.FILLED)
+                cv2.circle(frame, right_eye, 5, (0, 255, 255), cv2.FILLED)
+
+                w, _ = detector.findDistance(right_eye, left_eye)
+                W = 6.3  # 人脸两眼之间的平均距离是6.3cm
+                foucs = 650  # 摄像头焦距
+                dist = int((foucs * W) / w)  # 计算距离
+
+                if dist < 60:  # 返回字号大小
+                    E_size = 40
+                elif dist > 1000:
+                    E_size = 800
+                else:
+                    E_size = int(dist - dist % 20)
+        return E_size
+
+class EyeDetector:
+    def __init__(self):
+        self.my_eyes = mp.solutions.face_mesh
+        self.eyes = self.my_eyes.FaceMesh(static_image_mode=True,
+                                          max_num_faces=1,
+                                          refine_landmarks=True,
+                                          min_detection_confidence=0.5,
+                                          min_tracking_confidence=0.5)
+        self.mpDraw = mp.solutions.drawing_utils
+        self.cap = cv2.VideoCapture(0)
+
+    def Distance(self):
+        face_mesh = self.my_eyes.FaceMesh()
+
+        # 读取帧
+        ret, frame = self.cap.read()
+        rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+        detector = FaceMeshDetector(maxFaces=1)  # 最多检测一张脸
+
+        img, faces = detector.findFaceMesh(frame, draw=False)  # 不绘制关键点
+
+        # 进行面部追踪
+        self.results = face_mesh.process(rgb_frame)
+
+        if self.results.multi_face_landmarks:
+
+            if faces:
+                face = faces[0]  # faces是三维列表，我们只需要第一张脸的所有关键点
+                # 获取瞳孔的坐标
+                left_eye = tuple(face[145])  # 左眼关键点坐标
+                right_eye = tuple(face[374])  # 右眼坐标
+
+                # 在图像上绘制瞳孔
+                cv2.circle(frame, left_eye, 5, (0, 255, 255), cv2.FILLED)
+                cv2.circle(frame, right_eye, 5, (0, 255, 255), cv2.FILLED)
+
+                w, _ = detector.findDistance(right_eye, left_eye)
+                W = 6.3  # 人脸两眼之间的平均距离是6.3cm
+                foucs = 650  # 摄像头焦距
+                dist = int((foucs * W) / w)  # 计算距离
+
+                if dist < 60:  # 返回字号大小
+                    E_size = 40
+                elif dist > 1000:
+                    E_size = 800
+                else:
+                    E_size = int(dist - dist % 20)
+        return E_size
 
 
 detector_ = HandDetector()
@@ -82,8 +174,8 @@ def gen_frames0(detector=detector_):
         # 将缓存里的流数据转成字节流
         frame = buffer.tobytes()
         # 指定字节流类型image/jpeg
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        # yield (b'--frame\r\n'
+        #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 
 
