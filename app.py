@@ -39,5 +39,15 @@ def get_direction():
             return jsonify(data)
 
 
+@app.route('/api/mediapipedirection', methods=['GET'])
+def get_direction():
+    eyes_detector = EyeDetector()
+    while 1:
+        E_size = eyes_detector.Distance()  # 获得手的信息
+        if E_size is not None:
+            data = {'E_size': E_size}
+            return jsonify(data)
+
+
 if __name__ == '__main__':
     app.run()

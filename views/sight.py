@@ -71,17 +71,9 @@ class HandDetector:
         return dirc
 
 
-
-
-
-
-
-
-
-
 class EyeDetector:
     def __init__(self):
-        self.my_eyes = mp.solutions.eyes
+        self.my_eyes = mp.solutions.face_mesh
         self.eyes = self.my_eyes.FaceMesh(static_image_mode=True,
                                           max_num_faces=1,
                                           refine_landmarks=True,
@@ -91,8 +83,7 @@ class EyeDetector:
         self.cap = cv2.VideoCapture(0)
 
     def Distance(self):
-        mp_face_mesh = mp.solutions.face_mesh
-        face_mesh = mp_face_mesh.FaceMesh()
+        face_mesh = self.my_eyes.FaceMesh()
 
         # 读取帧
         ret, frame = self.cap.read()
@@ -103,37 +94,38 @@ class EyeDetector:
         img, faces = detector.findFaceMesh(frame, draw=False)  # 不绘制关键点
 
         # 进行面部追踪
-        results = face_mesh.process(rgb_frame)
+        self.results = face_mesh.process(rgb_frame)
 
-        if results.multi_face_landmarks:
-            for face_landmarks in results.multi_face_landmarks:
+        if self.results.multi_face_landmarks:
 
-                if faces:
-                    face = faces[0]  # faces是三维列表，我们只需要第一张脸的所有关键点
-                    # 获取瞳孔的坐标
-                    left_eye = tuple(face[145])  # 左眼关键点坐标
-                    right_eye = tuple(face[374])  # 右眼坐标
+            if faces:
+                face = faces[0]  # faces是三维列表，我们只需要第一张脸的所有关键点
+                # 获取瞳孔的坐标
+                left_eye = tuple(face[145])  # 左眼关键点坐标
+                right_eye = tuple(face[374])  # 右眼坐标
 
-                    # 在图像上绘制瞳孔
-                    cv2.circle(frame, left_eye, 5, (0, 255, 255), cv2.FILLED)
-                    cv2.circle(frame, right_eye, 5, (0, 255, 255), cv2.FILLED)
+                # 在图像上绘制瞳孔
+                cv2.circle(frame, left_eye, 5, (0, 255, 255), cv2.FILLED)
+                cv2.circle(frame, right_eye, 5, (0, 255, 255), cv2.FILLED)
 
-                    w, _ = detector.findDistance(right_eye, left_eye)
-                    W = 6.3  # 人脸两眼之间的平均距离是6.3cm
-                    foucs = 650  # 摄像头焦距
-                    dist = int((foucs * W) / w)  # 计算距离
+                w, _ = detector.findDistance(right_eye, left_eye)
+                W = 6.3  # 人脸两眼之间的平均距离是6.3cm
+                foucs = 650  # 摄像头焦距
+                dist = int((foucs * W) / w)  # 计算距离
 
-                    E_size = int(10 + (1000 - 10) * ((dist - 50) / 950))
+                E_size = int(10 + (1000 - 10) * ((dist - 50) / 950))
 
-                    if dist < 50:  # 返回字号大小
-                        return 10
-                    elif dist > 1000:
-                        return 1000
-                    else:
-                        return E_size
+                if dist < 50:  # 返回字号大小
+                    return 10
+                elif dist > 1000:
+                    return 1000
+                else:
+                    return E_size
 
 
 detector_ = HandDetector()
+
+
 def gen_frames0(detector=detector_):
     detector = HandDetector()
     while 1:
