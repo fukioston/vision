@@ -1,3 +1,4 @@
+import threading
 import time
 
 import cv2 as cv2
@@ -19,6 +20,7 @@ options = GestureRecognizerOptions(
     running_mode=VisionRunningMode.VIDEO)
 recognizer = GestureRecognizer.create_from_options(options)
 
+
 class HandDetector:
 
     def __init__(self):
@@ -35,7 +37,7 @@ class HandDetector:
                                         min_tracking_confidence=0.5)
         self.mpDraw = mp.solutions.drawing_utils  # 绘制手部关键点
         self.capture = cv2.VideoCapture(0)  # 创建一个视频捕获对象
-        self.timestamp = 0#时间戳
+        self.timestamp = 0  # 时间戳
 
     def findDirection(self):
 
@@ -55,7 +57,6 @@ class HandDetector:
 
         if self.results.multi_hand_landmarks:
             for myHand in self.results.multi_hand_landmarks:
-
 
                 lm_mcp = myHand.landmark[self.mpHands.HandLandmark.INDEX_FINGER_MCP]
                 lm_pip = myHand.landmark[self.mpHands.HandLandmark.INDEX_FINGER_PIP]
@@ -86,6 +87,7 @@ class HandDetector:
                         dirc = 4
 
         return dirc
+
     def Distance(self):
         face_mesh = self.my_eyes.FaceMesh()
 
@@ -124,6 +126,7 @@ class HandDetector:
                 else:
                     E_size = int(dist - dist % 20)
         return E_size
+
 
 class EyeDetector:
     def __init__(self):
@@ -176,28 +179,32 @@ class EyeDetector:
         return E_size
 
 
+lock = threading.Lock()
 detector_ = HandDetector()
+
+
 def get_direction2():
-    # frame_count=detector_.timestamp
     while True:
-        time.sleep(0.05)
-        frame_count = detector_.timestamp
+        time.sleep(0.1)
         success, frame = detector_.capture.read()
         imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # cv2图像初始化
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
-        recognition_result = recognizer.recognize_for_video(mp_image, frame_count)
-        # frame_count+=1
-        detector_.timestamp += 1
-        # print(recognition_result)
-        if recognition_result:
-            if recognition_result.gestures:
-                t = recognition_result.gestures[0][0].category_name
-            else:
-                t = None
-            # print("test:"+t)
-            if t:
-                data = {'direction': t}
-                return jsonify(data)
+        with lock:
+            detector_.timestamp += 1
+            frame_count = detector_.timestamp
+            print(frame_count)
+            recognition_result = recognizer.recognize_for_video(mp_image, frame_count)
+            if recognition_result:
+                if recognition_result.gestures:
+                    t = recognition_result.gestures[0][0].category_name
+                else:
+                    t = None
+                # print("test:"+t)
+                if t:
+                    data = {'direction': t}
+                    return jsonify(data)
+
+
 def gen_frames0(detector=detector_):
     pass
     # while 1:
@@ -209,9 +216,6 @@ def gen_frames0(detector=detector_):
     #     ret1, buffer = cv2.imencode('.jpg', frame)
     #     # 将缓存里的流数据转成字节流
     #     frame = buffer.tobytes()
-        # 指定字节流类型image/jpeg
-        # yield (b'--frame\r\n'
-        #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-
-
+    # 指定字节流类型image/jpeg
+    # yield (b'--frame\r\n'
+    #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')

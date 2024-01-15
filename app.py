@@ -55,7 +55,9 @@ def get_direction():
             return jsonify(data)
 @app.route('/api/mediapipedirection2', methods=['GET'])
 def get_direction22():
-    return get_direction2()
+    x=get_direction2()
+    if x:
+        return x
 
 error_count = 0
 pre_size = -1
