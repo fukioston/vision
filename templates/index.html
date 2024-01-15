@@ -58,10 +58,31 @@
 <div class="con">
     <img src="{{url_for('video_feed0')}}" alt="" width="100%">
 </div>
+<!-- 显示分数 -->
+<div id="score-display">Score: 0</div>
+
 
 <script>
         var mediapipeDirection = 0;
         var E_direction = 1;
+        var score=4.0;
+        var error=0;
+        var currentProgress = 0;
+function calculateFontSize(score) {
+    // 基本字体大小，您可以根据需要调整
+    var baseSize = 8;
+    console.log(score)
+    var a={4.0: 14, 4.1: 12, 4.2: 11, 4.3: 10, 4.4: 9, 4.5: 8.5, 4.6: 7.5, 4.7: 6.6, 4.8: 6, 4.9: 5, 5.0: 4, 5.1: 3, 5.2: 2, 5.3: 1.5}
+    // 根据分数调整大小，这里假设分数越高，字体越小
+    // 您可以根据应用逻辑调整这个公式
+    return baseSize *a[score.toFixed(1)];
+}
+// 在您的updateLetterDirection函数中
+
+function updateProgressBar(percentage) {
+    var progressBar = document.getElementById("progress-bar");
+    progressBar.style.width = percentage + '%';
+}
 
           // 使用Fetch API 发起GET请求
           function updateLetterDirection() {
@@ -79,11 +100,18 @@
             // 判断方向是否正确,正确则修改修改方向
             //console.log("media:", typeof mediapipeDirection, mediapipeDirection);
             //console.log("E:", typeof E_direction, E_direction);
+
             if (mediapipeDirection === E_direction) {
                 //改变E的方向
                 fetch('/api/angle')
                 .then(response => response.json())
                 .then(data => {
+                score+=0.1;
+                var scoreDisplay = document.getElementById("score-display");
+                scoreDisplay.innerText = "Score: " + score.toFixed(1);
+                var fontSize = calculateFontSize(score);
+                letterE.style.fontSize = fontSize + 'px';
+                console.log(letterE)
                 // 在这里使用返回的角度来改变字母E的方向
                 const dynamicLetter = document.getElementById('vision-test');
                 E_direction = data.rotation_angle;

@@ -1,4 +1,4 @@
-class rules:
+class standard:
     def __init__(self):
         self.distance = 500  # cm
         self.score = 4.0

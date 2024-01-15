@@ -26,6 +26,7 @@ detector = detector_
 @app.route('/api/angle', methods=['GET'])
 def generate_rotation_angle():
     rand = random.randint(1, 4)
+
     data = {'rotation_angle': rand}
     return jsonify(data)
 
