@@ -15,6 +15,11 @@ def index():
     return render_template("index.html", rotation_angle=generate_rotation_angle, finger_director=get_direction)
 
 
+@app.route("/test2")
+def test2():
+    return render_template("test2.html", rotation_angle=generate_rotation_angle, finger_director=get_direction)
+
+
 @app.route('/video_feed0')
 def video_feed0():
     return Response(gen_frames0(), mimetype='multipart/x-mixed-replace; boundary=frame')
@@ -48,7 +53,6 @@ def get_size():
         if E_size is not None:
             data = {'E_size': E_size}
             return jsonify(data)
-
 
 
 if __name__ == '__main__':

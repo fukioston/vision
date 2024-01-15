@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>camera</title>
+
+    <style>
+        .con{
+           float:left;
+           height:600px;width:600px;
+           margin-right:10px;
+        }
+
+        /*视力表E的样式*/
+        #vision-test {
+            font-family: Arial, sans-serif;
+            font-size: 48px;
+            line-height: 1.2;
+            text-align: center;
+            transition: transform 0.1s ease-in-out;
+        }
+     .container {
+    position: relative;
+    float: left;
+    height: 500px; /* 调整为所需尺寸 */
+    width: 500px; /* 调整为所需尺寸 */
+}
+
+.video-stream {
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* 确保视频在底层 */
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('9e309042e317715f97843e6843321b2.png'); /* 替换为你的图片路径 */
+    background-size: cover; /* 覆盖整个容器 */
+    z-index: 100; /* 确保覆盖层在顶层 */
+}
+
+    </style>
+
+</head>
+
+<body>
+
+<!--显示视力表字母E-->
+    <div id="vision-test">
+        8
+    </div>
+
+<h3>接受传输来的视频</h3>
+<div class="con">
+    <img src="{{url_for('video_feed0')}}" alt="" width="100%">
+</div>
+<!-- 显示分数 -->
+<div id="score-display">Score: 4.0</div>
+
+
+<script>
+        var mediapipeDirection = 0;
+        var E_direction = 3;
+        var score=4.0;
+        var error=0;
+        var currentProgress = 0;
+        function  init(){
+            fetch('/api/mediapipedirection/size')
+        .then(response => response.json())
+        .then(data => {
+            const letterE = document.getElementById('vision-test');
+            letterE.style.fontSize = data.E_size + 'px';
+            {#    E_direction = data.E_size;#}
+            {#console.log(data); // 处理返回的数据#}
+            // 这里可以根据返回的数据更新页面
+        })
+        .catch(error => console.error('Error:', error));
+        }
+        init()
+function calculateFontSize(score) {
+    // 基本字体大小，您可以根据需要调整
+    var baseSize = 8;
+    console.log(score)
+    var a={4.0: 14, 4.1: 12, 4.2: 11, 4.3: 10, 4.4: 9, 4.5: 8.5, 4.6: 7.5, 4.7: 6.6, 4.8: 6, 4.9: 5, 5.0: 4, 5.1: 3, 5.2: 2, 5.3: 1.5}
+    return baseSize *a[score.toFixed(1)];
+}
+// 在您的updateLetterDirection函数中
+
+function updateProgressBar(percentage) {
+    var progressBar = document.getElementById("progress-bar");
+    progressBar.style.width = percentage + '%';
+}
+
+          // 使用Fetch API 发起GET请求
+          function updateLetterDirection() {
+            var letterE = document.getElementById("vision-test");
+
+            // 映射mediapipe返回的方向到字母 E 的方向
+            var directionMap = {
+                1: 5,    // 右
+                2:6,  // 下
+                3: 8,  // 左
+                4: 9   // 上
+            };
+
+
+            // 判断方向是否正确,正确则修改修改方向
+            //console.log("media:", typeof mediapipeDirection, mediapipeDirection);
+            //console.log("E:", typeof E_direction, E_direction);
+            console.log(mediapipeDirection)
+              console.log(E_direction)
+            if (mediapipeDirection === E_direction) {
+                //改变E的方向
+                fetch('/api/angle')
+                .then(response => response.json())
+                .then(data => {
+                score+=0.1;
+                var scoreDisplay = document.getElementById("score-display");
+                scoreDisplay.innerText = "Score: " + score.toFixed(1);
+                var fontSize = calculateFontSize(score);
+                letterE.style.fontSize = fontSize + 'px';
+                    E_direction = data.rotation_angle;
+                    letterE.innerText=directionMap[data.rotation_angle]
+
+        })
+        .catch(error => console.error('Error fetching angle:', error));
+            }
+        }
+
+        //根据捕捉的食指方向
+        var pre_time = new Date();
+        var end_time = new Date();
+        var temp = -1;
+
+        var directionCount = {
+            1: 0,
+            2: 0,
+            3: 0,
+            4: 0
+        }
+        setInterval(function () {
+             fetch('/api/mediapipedirection')
+                .then(response => response.json())
+                .then(data => {
+                temp = data.direction;
+                directionCount[temp] += 1;
+              })
+             .catch(error => console.error('Error fetching direction:', error));
+            end_time = new Date();
+            if(end_time - pre_time >= 1000){
+                pre_time = end_time;
+                //以一秒内出现次数最多的方向为此次食指的方向
+                temp = Object.keys(directionCount).reduce((a, b) => directionCount[a] > directionCount[b] ? a : b);
+                mediapipeDirection = parseInt(temp, 10);
+                //字典值清零
+                directionCount[1] = 0;
+                directionCount[2] = 0;
+                directionCount[3] = 0;
+                directionCount[4] = 0;
+                updateLetterDirection();
+             }
+        }, 50); // 10ms更新一次方向，实际应替换为适当的时间间隔
+    </script>
+
+</body>
+</html>
