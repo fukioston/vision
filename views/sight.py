@@ -185,7 +185,6 @@ detector_ = HandDetector()
 
 def get_direction2():
     while True:
-        time.sleep(0.1)
         success, frame = detector_.capture.read()
         imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # cv2图像初始化
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
