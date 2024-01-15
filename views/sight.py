@@ -113,14 +113,13 @@ class EyeDetector:
                 foucs = 650  # 摄像头焦距
                 dist = int((foucs * W) / w)  # 计算距离
 
-                E_size = int(10 + (1000 - 10) * ((dist - 50) / 950))
-
-                if dist < 50:  # 返回字号大小
-                    return 10
+                if dist < 60:  # 返回字号大小
+                    E_size = 40
                 elif dist > 1000:
-                    return 1000
+                    E_size = 800
                 else:
-                    return E_size
+                    E_size = int(dist - dist % 20)
+        return E_size
 
 
 detector_ = HandDetector()
