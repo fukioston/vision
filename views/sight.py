@@ -1,10 +1,34 @@
+import time
+
 import cv2 as cv2
 import mediapipe as mp
 import math
 from cvzone.FaceMeshModule import FaceMeshDetector
 import random
 import numpy
+from flask import jsonify
 
+BaseOptions = mp.tasks.BaseOptions
+GestureRecognizer = mp.tasks.vision.GestureRecognizer
+GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
+GestureRecognizerResult = mp.tasks.vision.GestureRecognizerResult
+VisionRunningMode = mp.tasks.vision.RunningMode
+
+# Create a gesture recognizer instance with the live stream mode:
+def print_result(result: GestureRecognizerResult, output_image: mp.Image, timestamp_ms: int):
+    if result.gestures:
+        t = result.gestures[0][0].category_name
+    else:
+        t = None
+
+    print("t:", t)
+    # print('gesture recognition result: {}'.format(result.gestures))
+
+options = GestureRecognizerOptions(
+    base_options=BaseOptions(model_asset_path='static/gesture_recognizer.task'),
+    running_mode=VisionRunningMode.LIVE_STREAM,
+    result_callback=print_result)
+recognizer = GestureRecognizer.create_from_options(options)
 
 class HandDetector:
 
@@ -22,6 +46,7 @@ class HandDetector:
                                         min_tracking_confidence=0.5)
         self.mpDraw = mp.solutions.drawing_utils  # 绘制手部关键点
         self.capture = cv2.VideoCapture(0)  # 创建一个视频捕获对象
+        self.timestamp = 0#时间戳
 
     def findDirection(self):
 
@@ -163,16 +188,39 @@ class EyeDetector:
 
 
 detector_ = HandDetector()
+def get_direction2():
+    while True:
+        # time.sleep(0.10)
+        data = {'direction': 6}
+        frame_count = detector_.timestamp
+        success, frame = detector_.capture.read()
+        imgRGB = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # cv2图像初始化
+        mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+        recognition_result = recognizer.recognize_async(mp_image, frame_count)
+        detector_.timestamp += 1
+        # print(frame_count)
+        # print(recognition_result)
+        if recognition_result:
+            if recognition_result.gestures:
+                t = recognition_result.gestures[0][0].category_name
+            else:
+                t = None
+            print(t)
+            if t:
+                print("test:"+t)
+                data = {'direction': t}
+                return jsonify(data)
 def gen_frames0(detector=detector_):
-    while 1:
-        direction = detector.findDirection()  # 获得手的信息
-        if direction is not None:
-            print("Detected direction:", direction)
-        # 显示图像（可选）
-        ret, frame = detector.capture.read()
-        ret1, buffer = cv2.imencode('.jpg', frame)
-        # 将缓存里的流数据转成字节流
-        frame = buffer.tobytes()
+    pass
+    # while 1:
+    #     direction = detector.findDirection()  # 获得手的信息
+    #     if direction is not None:
+    #         print("Detected direction:", direction)
+    #     # 显示图像（可选）
+    #     ret, frame = detector.capture.read()
+    #     ret1, buffer = cv2.imencode('.jpg', frame)
+    #     # 将缓存里的流数据转成字节流
+    #     frame = buffer.tobytes()
         # 指定字节流类型image/jpeg
         # yield (b'--frame\r\n'
         #        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')

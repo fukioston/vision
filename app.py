@@ -1,3 +1,5 @@
+import time
+
 from flask import Flask, render_template, Response, jsonify, request
 import random
 import cv2 as cv2
@@ -5,7 +7,6 @@ import mediapipe as mp
 import math
 import numpy
 from views.sight import *
-
 app = Flask(__name__)
 
 
@@ -43,6 +44,9 @@ def get_direction():
         if direction:
             data = {'direction': direction}
             return jsonify(data)
+@app.route('/api/mediapipedirection2', methods=['GET'])
+def get_direction22():
+    get_direction2()
 
 error_count = 0
 pre_size = -1
