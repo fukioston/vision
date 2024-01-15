@@ -1,4 +1,5 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, Response, jsonify
+import random
 import cv2 as cv2
 import mediapipe as mp
 import math
@@ -9,15 +10,33 @@ app = Flask(__name__)
 
 
 # 电脑自带摄像头
-
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", rotation_angle=generate_rotation_angle, finger_director=get_direction)
 
 
 @app.route('/video_feed0')
 def video_feed0():
     return Response(gen_frames0(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+detector = detector_
+
+
+@app.route('/api/angle', methods=['GET'])
+def generate_rotation_angle():
+    rand = random.randint(1, 4)
+    data = {'rotation_angle': rand}
+    return jsonify(data)
+
+
+@app.route('/api/mediapipedirection', methods=['GET'])
+def get_direction():
+    while 1:
+        direction = detector.findDirection()  # 获得手的信息
+        if direction is not None:
+            data = {'direction': direction}
+            return jsonify(data)
 
 
 if __name__ == '__main__':
