@@ -39,15 +39,15 @@ def get_direction():
             return jsonify(data)
 
 
-@app.route('/api/mediapipedirection', methods=['GET'])
+@app.route('/api/mediapipedirection/size', methods=['GET'])
 def get_size():
     eyes_detector = EyeDetector()
     while 1:
         E_size = eyes_detector.Distance()  # 获得字号大小
         if E_size is not None:
             data = {'E_size': E_size}
-            print(data)
             return jsonify(data)
+
 
 
 if __name__ == '__main__':
