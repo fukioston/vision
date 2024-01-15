@@ -191,7 +191,7 @@ def get_direction2():
         with lock:
             detector_.timestamp += 1
             frame_count = detector_.timestamp
-            print(frame_count)
+            # print(frame_count)
             recognition_result = recognizer.recognize_for_video(mp_image, frame_count)
             if recognition_result:
                 if recognition_result.gestures:

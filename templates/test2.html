@@ -61,7 +61,7 @@
 <!-- 显示分数 -->
 <div id="score-display">Score: 4.0</div>
 
-
+<!--<script src="../static/process_bar_and_random_judge.js"></script>-->
 <script>
         var mediapipeDirection = 0;
         var E_direction = 8;
@@ -113,12 +113,20 @@ function updateProgressBar(percentage) {
             // 判断方向是否正确,正确则修改修改方向
             //console.log("media:", typeof mediapipeDirection, mediapipeDirection);
             //console.log("E:", typeof E_direction, E_direction);
-            console.log("我测试"+mediapipeDirection)
-              console.log("我测试2"+E_direction)
+            console.log("我的手势："+mediapipeDirection)
+              console.log("正确的："+E_direction)
             {#  console.log(E_direction)#}
             if (mediapipeDirection === E_direction) {
                 //改变E的方向
-                fetch('/api/number')
+                fetch('/api/number',{
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+        },
+                body: JSON.stringify({
+            value: E_direction
+        }),
+    })
                 .then(response => response.json())
                 .then(data => {
                 score+=0.1;

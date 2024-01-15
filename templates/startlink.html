@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>初始界面</title>
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+        }
+        .btn {
+            width: 8em;
+            height: 3em;
+            margin: 0.5em;
+            background: black;
+            color: white;
+            border:2px solid white;
+            border-radius: 0.625em;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        button:hover {
+            color: black;
+        }
+
+        button:after {
+            content: "";
+            background: white;
+            position: absolute;
+            z-index: -1;
+            left: -20%;
+            right: -20%;
+            top: 0;
+            bottom: 0;
+            transform: skewX(-45deg) scale(0, 1);
+            transition: all 0.5s;
+        }
+
+        button:hover:after {
+            transform: skewX(-45deg) scale(1, 1);
+            -webkit-transition: all 0.5s;
+            transition: all 0.5s;
+        }
+        .background-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; /* 确保背景在其他内容之后 */
+        }
+        .content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white; /* 调整文本颜色 */
+        }
+
+
+        .text {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            transform-origin: -100%;
+            transform: scale(1);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .tooltip-container {
+            --background: #333333;
+            --color: #e8e8e8;
+            position: fixed; /* 将位置设置为固定 */
+            bottom: 20px; /* 距离底部的距离 */
+            right: 20px; /* 距离右侧的距离 */
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color);
+            padding: 0.7em 1.8em;
+            border-radius: 8px;
+            text-transform: uppercase;
+            height: 40px;
+            width: 150px;
+            display: grid;
+            place-items: center;
+            border: 2px solid var(--color);
+        }
+
+            .tooltip-container span:last-child {
+                position: absolute;
+                top: 0%;
+                left: 100%;
+                width: 100%;
+                height: 100%;
+                border-radius: 8px;
+                opacity: 1;
+                background-color: var(--background);
+                z-index: -1;
+                border: 2px solid var(--background);
+                transform: scale(0);
+                transform-origin: 0;
+                transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+                display: grid;
+                place-items: center;
+            }
+
+        .tooltip {
+            position: absolute;
+            top: calc(100% + 80px);
+            height:60px;
+            margin-left: 1px;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 0.3em 0.6em;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            background: var(--background);
+            z-index: -1;
+            border-radius: 8px;
+            scale: 0;
+            transform-origin: 0 0;
+            text-transform: capitalize;
+            font-weight: 400;
+            font-size: 15px;
+            box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+            width: 250px;
+        }
+
+            .tooltip::before {
+                position: absolute;
+                content: "";
+                height: 0.6em;
+                width: 0.6em;
+                bottom: -0.2em;
+                left: 50%;
+                transform: translate(-50%) rotate(45deg);
+                background: var(--background);
+            }
+
+        .tooltip-container:hover .tooltip {
+            top: -100%;
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            scale: 1;
+            animation: shake 0.5s ease-in-out both;
+        }
+
+        .tooltip-container:hover {
+            box-shadow: rgba(0, 0, 0, 0.25) 0 8px 15px;
+            color: white;
+            border-color: transparent;
+        }
+
+            .tooltip-container:hover span:last-child {
+                transform: scale(1);
+                left: 0;
+            }
+
+            .tooltip-container:hover .text {
+                opacity: 0;
+                top: 0%;
+                left: 100%;
+                transform: scale(0);
+            }
+
+        @keyframes shake {
+            0% {
+                rotate: 0;
+            }
+
+            25% {
+                rotate: 7deg;
+            }
+
+            50% {
+                rotate: -7deg;
+            }
+
+            75% {
+                rotate: 1deg;
+            }
+
+            100% {
+                rotate: 0;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div>
+        <script type="module">
+            // 导入三维模型库
+            import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
+            // 导入轨道控制库
+            import { OrbitControls } from "https://cdn.skypack.dev/three@0.136.0/examples/jsm/controls/OrbitControls";
+            // 清除控制台
+            console.clear()
+            // 创建场景
+            let scene = new THREE.Scene()
+            // 设置场景背景颜色
+            scene.background = new THREE.Color(0x160016)
+
+            // 创建相机
+            let camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 1, 1000)
+            // 设置相机位置
+            camera.position.set(0, 4, 21)
+
+            // 创建渲染器
+            let renderer = new THREE.WebGLRenderer()
+            // 设置渲染器大小
+            renderer.setSize(innerWidth, innerHeight)
+            // 把渲染器加入到页面中
+            document.body.appendChild(renderer.domElement)
+            // 监听窗口大小变化事件
+            window.addEventListener("resize", event => {
+                camera.aspect = innerWidth / innerHeight
+                camera.updateProjectionMatrix()
+                renderer.setSize(innerWidth, innerHeight)
+            })
+
+            // 创建控制器
+            let controls = new OrbitControls(camera, renderer.domElement)
+            // 开启阻尼效果
+            controls.enableDamping = true
+            // 禁用面板
+            controls.enablePan
+            // 创建全局uniform
+            let gu = {
+                time: { value: 0 }
+            }
+            // 创建点的大小数组和移动数组
+            let sizes = []
+            let shift = []
+
+            // 创建移动函数
+            let pushShift = () => {
+                shift.push(
+                    Math.random() * Math.PI,
+                    Math.random() * Math.PI * 2,
+                    (Math.random() * 0.9 + 0.1) * Math.PI * 0.1,
+                    Math.random() * 0.9 + 0.1
+                )
+            }
+
+            // 创建点的顶点数组（中间的球体）
+            // 创建一个长度为5万的数组pts并y用Array.prototype.map()方法遍历数组并对每个元素进行操作
+            let pts = new Array(50000).fill().map(p => {
+                // 每次遍历中，会向sizes数组中添加一个随机大小
+                sizes.push(Math.random() * 1.5 + 0.5)
+                // 调用pushShift()函数添加位置信息，并返回一个随机方向的THREE.Vector对象
+                pushShift()
+                return new THREE.Vector3().randomDirection().multiplyScalar(Math.random() * 0.5 + 9.5)
+                //
+            })
+
+            // 添加更多的点（旁边围绕的）
+            // 先循环生成十万个点
+            // 每次循环中生成一个随机数rand，再生成一个随机半径radius
+
+            for (let i = 0; i < 100000; i++) {
+                let r = 10, R = 40;
+                let rand = Math.pow(Math.random(), 1.5);
+                let radius = Math.sqrt(R * R * rand + (1 - rand) * r * r);
+                // 使用new THREE.Vector3().setFromCylindricalCoords()生成一个点。
+                pts.push(new THREE.Vector3().setFromCylindricalCoords(radius, Math.random() * 2 * Math.PI, (Math.random() - 0.5) * 2));
+                sizes.push(Math.random() * 1.5 + 0.5);
+                pushShift();
+            }
+            // 生成一个点g，同时将点的大小和位置信息添加到sizes和shift数组中
+            let g = new THREE.BufferGeometry().setFromPoints(pts)
+            // 创建了一个缓冲几何体并设置sizes和shift属性
+            // 注意这里的F要大写Float32BufferAttribute
+            g.setAttribute("sizes", new THREE.Float32BufferAttribute(sizes, 1))
+            g.setAttribute("shift", new THREE.Float32BufferAttribute(shift, 4))
+            // 创建点材质
+            let m = new THREE.PointsMaterial({
+                // 表示点的大小
+                size: 0.08,
+                // 设置材质为透明
+                transparent: true,
+                // 表示禁用深度测试，使点可以叠加
+                depthTest: false,
+                // 使用假发混合模式
+                blending: THREE.AdditiveBlending,
+                // 在材质编译之前修改颜色器，在这里，它用来替换顶点着色器和片元着色器，添加uniform
+                // 和attribute，以鸡自定义颜色和移动
+                onBeforeCompile: shader => {
+                    shader.uniforms.time = gu.time
+                    // 首先，它为着色器设置了一个uniform变量time，该变量是在点材质中定义的，用来追踪时间
+                    // 然后它定义了两个attribute变量sizes和shift，这两个变量是在缓冲几何体中定义的，用来控制点的大小和移动
+                    // 最后使用replace方法来替换顶点着色器中的代码
+                    shader.vertexShader = `
+                                                uniform float time;
+                                                attribute float sizes;
+                                                attribute vec4 shift;
+                                                varying vec3 vColor;
+                                                ${shader.vertexShader}
+                                                `
+                        // 注意上面的 ` 不要漏掉了
+                        // 使用replace来替换着色器中的代码
+                        // 更新点的大小
+                        .replace(
+                            `gl_PointSize = size;`,
+                            `gl_PointSize = size * sizes;`
+                        )
+                        // 更新点的颜色
+                        .replace(
+                            `#include <color_vertex>`,
+                            `#include <color_vertex>
+                                                    float d = length(abs(position)/vec3(40.,10.,40));
+                                                    d=clamp(d,0.,1.);
+                                                    vColor = mix(vec3(227.,155.,0.),vec3(100.,50.,255.),d)/255.;`
+                        )
+                        // 记得加上分号
+                        // 更新点的移动
+                        .replace(
+                            `#include <begin_vertex>`,
+                            `#include <begin_vertex>
+                                                            float t = time;
+                                                            float moveT = mod(shift.x + shift.z * t,PI2);
+                                                            float moveS = mod(shift.y + shift.z * t,PI2);
+                                                            transformed += vec3(cos(moveS) * sin(moveT),cos(moveT),sin(moveS)*sin(moveT)) * shift.w;
+                                                            `
+                        )
+                    // 修改片元着色器，用来让点的边缘更加圆滑
+
+                    // 首先，定义一个varying变量vColor，这个变量是在顶点着色器中定义的，用来传递点的颜色到片段着色器
+                    // 然后使用replace方法来替换片段着色器的代码
+                    shader.fragmentShader = `
+                                                    varying vec3 vColor;
+                                                    ${shader.fragmentShader}
+                                                `.replace(
+                        `#include <clipping_planes_fragment>`,
+                        `#include <clipping_planes_fragment>
+                                                        float d = length(gl_PointCoord.xy - 0.5);
+                                                    `
+                    ).replace(
+                        // 记得加上空格
+                        `vec4 diffuseColor = vec4( diffuse, opacity );`,
+                        `vec4 diffuseColor = vec4( vColor, smoothstep(0.5, 0.1, d)/* * 0.5+0.5*/);`
+                    );
+                }
+
+            })
+            // -------------------------------------------------------------
+            // 创建点云并将其添加到场景中，并设置渲染循环
+            let p = new THREE.Points(g, m)
+            // 旋转顺序为"ZYX"
+            p.rotation.order = "ZYX"
+            // 旋转角度 0.2
+            p.rotation.z = 0.2
+            // 把对象（p）添加到场景（scene）中
+            scene.add(p)
+            // 创建一个时钟对象clock
+            let clock = new THREE.Clock()
+            // 渲染循环，每次循环中会更新控制器，更新p的旋转角度，更新时间
+            renderer.setAnimationLoop(() => {
+                // 更新控制器
+                controls.update()
+                // 获取时钟对象（clock）的已经流逝的时间（t）并将他乘0.5
+                // 先把时钟关了
+                let t = clock.getElapsedTime() * 0.5
+                // 将gu.time.value 设置为t*Math.PI
+                gu.time.value = t * Math.PI
+                // 将对象（p）的旋转角度y设置为t*0.05
+                p.rotation.y = t * 0.05
+                // 渲染场景（scene）和相机（camera）
+                renderer.render(scene, camera)
+            })</script>
+    </div>
+    <div class="content">
+        <h1>Welcome to My Eyesight Test</h1>
+        <button class="btn" id="myButton">
+            Click to Start
+        </button>
+
+        <!-- 可以继续添加其他内容 -->
+    </div>
+    <div class="tooltip-container">
+        <span class="tooltip">When you click to start,the website will open your camera and take your video</span>
+        <span class="text">Help Here👋</span>
+        <span>Tooltip 👆</span>
+    </div>
+
+    <script>
+    // 获取按钮元素
+    var button = document.getElementById("myButton");
+
+    // 添加点击事件监听器
+    button.addEventListener("click", function () {
+        // 在这里执行跳转逻辑
+        window.location.href = "index"; } )// 修改为你想要跳转的页面的URL
+
+    </script>
+
+</body>
+
+</html>

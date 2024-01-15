@@ -21,7 +21,7 @@
         var progressInterval = setInterval(updateProgress, interval);
     }
 
-
+        var error_count = 0;
         var vision = 0.0;
         var mediapipeDirection = 0;
         var E_direction = 1;
@@ -49,27 +49,35 @@
             if (mediapipeDirection === E_direction){
                 answer = 1;
             }
+            else{
+                error_count += 1;
+            }
+
+            if(error_count >= 2){
+                shouldExit = true;
+                 alert("视力评估结束！");
+            }
             var dataToSend = {
                 "distance":distance,
                 "answer":answer
             }
 
-            fetch('/api/return', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(dataToSend),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if(data.exit === 1){
-                        shouldExit = true;
-                        alert(data.best_vision);
-                    }
-                    //console.log('Success:', data);
-                })
-                .catch((error) => { console.error('Error:', error);});
+//            fetch('/api/return', {
+//                method: 'POST',
+//                headers: {
+//                    'Content-Type': 'application/json',
+//                },
+//                body: JSON.stringify(dataToSend),
+//                })
+//                .then(response => response.json())
+//                .then(data => {
+//                    if(data.exit === 1){
+//                        shouldExit = true;
+//                        alert("视力评估结束！");
+//                    }
+//                    //console.log('Success:', data);
+//                })
+//                .catch((error) => { console.error('Error:', error);});
 
 
             if (mediapipeDirection === E_direction) {
@@ -88,6 +96,7 @@
         }
 
         //根据捕捉的食指方向
+        var intervalId
         var pre_time = new Date();
         var end_time = new Date();
         var temp = -1;
@@ -100,7 +109,8 @@
         }
 
         simulateProgress();
-        setInterval(function () {
+        intervalId = setInterval(function () {
+        console.log('exit:',shouldExit);
              fetch('/api/mediapipedirection')
                 .then(response => response.json())
                 .then(data => {
@@ -111,7 +121,7 @@
             end_time = new Date();
             if(end_time - pre_time >= 5000 && !shouldExit){
                 pre_time = end_time;
-                //以2秒内出现次数最多的方向为此次食指的方向
+                //以5秒内出现次数最多的方向为此次食指的方向
                 temp = Object.keys(directionCount).reduce((a, b) => directionCount[a] > directionCount[b] ? a : b);
                 mediapipeDirection = parseInt(temp, 10);
                 //字典值清零
@@ -121,5 +131,20 @@
                 directionCount[4] = 0;
                 updateLetterDirection();
                 simulateProgress();
+                handleShouldExit();
              }
+
         }, 50); // 50ms更新一次方向
+        var exitEvent = new Event('exitEvent');
+// 在适当的时候触发事件
+        function handleShouldExit() {
+            if (shouldExit) {
+                document.dispatchEvent(exitEvent);
+            }
+        }
+
+        // 使用事件监听器监听事件
+        document.addEventListener('exitEvent', function() {
+            clearInterval(intervalId);
+            console.log('周期函数结束');
+        });
