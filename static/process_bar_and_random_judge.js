@@ -71,7 +71,10 @@ function simulateProgress1() {
 //simulateProgress1();
 
         var the_last_gesture = 0;
-        var error_count = 0;
+        var is_green = 0;
+        var is_blue = 0;
+        var blue_error_count = 0;
+        var green_error_count = 0;
         var vision = 0.0;
         var mediapipeDirection = 0;
         var E_direction = 1;
@@ -100,10 +103,17 @@ function simulateProgress1() {
                 answer = 1;
             }
             else{
-                error_count += 1;
+                if(is_blue){
+                    blue_error_count += 1;
+                }
+                else{
+                    if(is_green){
+                        green_error_count += 1;
+                    }
+                }
             }
 
-            if(error_count >= 2){
+            if(blue_error_count >= 2 || green_error_count >= 1){
                 shouldExit = true;
                 fetch('/api/close')
         .then(response=>{
@@ -179,8 +189,10 @@ function simulateProgress1() {
                 pre_time = end_time;
                 mediapipeDirection = the_last_gesture;
 
-                 // clearInterval(intervalId);
-                 updateLetterDirection();
+                is_blue = 1;
+                updateLetterDirection();
+                is_blue = 0;
+                blue_error_count = 0;
                 clearInterval(progressInterval);
                 clearInterval(progressInterval1);
 
@@ -201,7 +213,10 @@ function simulateProgress1() {
                     directionCount[3] = 0;
                     directionCount[4] = 0;
 
+                    is_green = 1;
                     updateLetterDirection();
+                    is_green = 0;
+                    green_error_count = 0;
                     clearInterval(progressInterval);
                     clearInterval(progressInterval1);
                     simulateProgress();
