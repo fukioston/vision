@@ -144,6 +144,11 @@ function simulateProgress1() {
                 fetch('/api/angle')
                 .then(response => response.json())
                 .then(data => {
+                    score+=0.1;
+                var scoreDisplay = document.getElementById("score-display");
+                scoreDisplay.innerText = "Score: " + score.toFixed(1);
+                var fontSize = calculateFontSize(score);
+                letterE.style.fontSize = fontSize + 'px';
                 // 在这里使用返回的角度来改变字母E的方向
                 const dynamicLetter = document.getElementById('vision-test');
                 E_direction = data.rotation_angle;
