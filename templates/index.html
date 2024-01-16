@@ -97,6 +97,7 @@
         var score=4.0;
         var error=0;
         var currentProgress = 0;
+        var intervalId;
         function  init(){
             fetch('/api/init')
         .then(response => response.json())

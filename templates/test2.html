@@ -89,7 +89,7 @@
         var pre_time = new Date();
         var end_time = new Date();
         var temp = -1;
-
+        var intervalId;
         var directionCount = {
             5: 0,
             6: 0,
@@ -98,7 +98,7 @@
             0:0,
         }
         function startUpdatingDirection() {
-            setInterval(function () {
+            intervalId = setInterval(function () {
                 fetch('/api/mediapipedirection2')
                     .then(response => response.json())
                     .then(data => {
@@ -148,6 +148,9 @@ function calculateFontSize(score) {
     else return baseSize*5.3
 }
 // 在您的updateLetterDirection函数中
+function stopUpdatingDirection() {
+    clearInterval(intervalId);
+}
 
 function updateProgressBar(percentage) {
     var progressBar = document.getElementById("progress-bar");
