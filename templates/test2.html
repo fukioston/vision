@@ -42,6 +42,19 @@
     background-size: cover; /* 覆盖整个容器 */
     z-index: 100; /* 确保覆盖层在顶层 */
 }
+.loading-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+    color: white;
+    display: grid;
+    place-items: center;
+    z-index: 9999; /* 确保它位于页面最上方 */
+}
+
 
     </style>
 
@@ -60,7 +73,9 @@
 </div>
 <!-- 显示分数 -->
 <div id="score-display">Score: 4.0</div>
-
+<div id="loadingMask" class="loading-mask">
+    加载摄像头中...
+</div>
 <!--<script src="../static/process_bar_and_random_judge.js"></script>-->
 <script>
         var mediapipeDirection = 0;
@@ -68,15 +83,57 @@
         var score=4.0;
         var error=0;
         var currentProgress = 0;
+        var loadingMask = document.getElementById("loadingMask");
+        loadingMask.style.display = "grid";
+        //根据捕捉的食指方向
+        var pre_time = new Date();
+        var end_time = new Date();
+        var temp = -1;
+
+        var directionCount = {
+            5: 0,
+            6: 0,
+            8: 0,
+            9: 0,
+            0:0,
+        }
+        function startUpdatingDirection() {
+            setInterval(function () {
+                fetch('/api/mediapipedirection2')
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data.direction + 'ss')
+                        if (data.direction === "none") directionCount[0] += 1;
+                        else {
+                            temp = data.direction;
+                            directionCount[temp] += 1;
+                        }
+                    })
+                    .catch(error => console.error('Error fetching direction:', error));
+                end_time = new Date();
+                if (end_time - pre_time >= 1000) {
+                    pre_time = end_time;
+                    //以一秒内出现次数最多的方向为此次食指的方向
+                    temp = Object.keys(directionCount).reduce((a, b) => directionCount[a] > directionCount[b] ? a : b);
+                    mediapipeDirection = parseInt(temp, 10);
+                    //字典值清零
+                    directionCount[5] = 0;
+                    directionCount[6] = 0;
+                    directionCount[8] = 0;
+                    directionCount[9] = 0;
+                    directionCount[0] = 0;
+                    updateLetterDirection();
+                }
+            }, 50);
+        }// 10ms更新一次方向，实际应替换为适当的时间间隔
         function  init(){
             fetch('/api/init')
         .then(response => response.json())
         .then(data => {
             const letterE = document.getElementById('vision-test');
             letterE.style.fontSize = data.E_size + 'px';
-            {#    E_direction = data.E_size;#}
-            {#console.log(data); // 处理返回的数据#}
-            // 这里可以根据返回的数据更新页面
+            loadingMask.style.display = "none";
+            startUpdatingDirection();
         })
         .catch(error => console.error('Error:', error));
         }
@@ -142,44 +199,7 @@ function updateProgressBar(percentage) {
             }
         }
 
-        //根据捕捉的食指方向
-        var pre_time = new Date();
-        var end_time = new Date();
-        var temp = -1;
 
-        var directionCount = {
-            5: 0,
-            6: 0,
-            8: 0,
-            9: 0,
-            0:0,
-        }
-        setInterval(function () {
-             fetch('/api/mediapipedirection2')
-                .then(response => response.json())
-                .then(data => {
-                    console.log(data.direction+'ss')
-                    if(data.direction==="none")directionCount[0] += 1;
-                    else{
-                        temp = data.direction;
-                directionCount[temp] += 1;}
-              })
-             .catch(error => console.error('Error fetching direction:', error));
-            end_time = new Date();
-            if(end_time - pre_time >= 1000){
-                pre_time = end_time;
-                //以一秒内出现次数最多的方向为此次食指的方向
-                temp = Object.keys(directionCount).reduce((a, b) => directionCount[a] > directionCount[b] ? a : b);
-                mediapipeDirection = parseInt(temp, 10);
-                //字典值清零
-                directionCount[5] = 0;
-                directionCount[6] = 0;
-                directionCount[8] = 0;
-                directionCount[9] = 0;
-                directionCount[0] = 0;
-                updateLetterDirection();
-             }
-        }, 50); // 10ms更新一次方向，实际应替换为适当的时间间隔
     </script>
 
 </body>
