@@ -36,7 +36,7 @@ class HandDetector:
                                         min_detection_confidence=0.5,
                                         min_tracking_confidence=0.5)
         self.mpDraw = mp.solutions.drawing_utils  # 绘制手部关键点
-        self.capture = cv2.VideoCapture(0)  # 创建一个视频捕获对象
+        self.capture = None  # 创建一个视频捕获对象
         self.timestamp = 0  # 时间戳
 
     def findDirection(self):

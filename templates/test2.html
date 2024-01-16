@@ -69,7 +69,7 @@
         var error=0;
         var currentProgress = 0;
         function  init(){
-            fetch('/api/mediapipedirection/size')
+            fetch('/api/init')
         .then(response => response.json())
         .then(data => {
             const letterE = document.getElementById('vision-test');

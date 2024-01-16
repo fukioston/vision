@@ -106,9 +106,9 @@ best_vision = -1
 #     return jsonify(data)  # 使用jsonify函数返回JSON格式的Response对象
 
 
-@app.route('/api/mediapipedirection/size', methods=['GET'])
-def get_size():
-    # eyes_detector = EyeDetector()
+@app.route('/api/init', methods=['GET'])
+def init():
+    detector.initialize_camera()
     while 1:
         E_size = detector.Distance()  # 获得字号大小
         if E_size is not None:
