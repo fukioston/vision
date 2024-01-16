@@ -12,12 +12,12 @@ app = Flask(__name__)
 
 # 电脑自带摄像头
 @app.route("/")
-def index():
+def start():
     return render_template("startlink.html")
 
 
-@app.route("/test1")
-def start():
+@app.route("/index")
+def index():
     return render_template("index.html")
 
 
@@ -63,6 +63,9 @@ def get_direction():
     direction = detector.findDirection()  # 获得手的信息
     if direction:
         data = {'direction': direction}
+        return jsonify(data)
+    else:
+        data = {'direction': 0}
         return jsonify(data)
 
 
@@ -115,6 +118,11 @@ def init():
             data = {'E_size': E_size}
             return jsonify(data)
 
+
+@app.route('/api/close', methods=['GET', 'POST'])
+def close():
+    detector.release_camera()
+    return jsonify({'state':True})
 
 if __name__ == '__main__':
     app.run()

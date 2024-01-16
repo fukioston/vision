@@ -202,7 +202,44 @@ function updateProgressBar(percentage) {
             }
         }
 
+        //根据捕捉的食指方向
+        var pre_time = new Date();
+        var end_time = new Date();
+        var temp = -1;
 
+        var directionCount = {
+            5: 0,
+            6: 0,
+            8: 0,
+            9: 0,
+            0:0,
+        }
+        setInterval(function () {
+             fetch('/api/mediapipedirection2')
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data.direction+'ss')
+                    if(data.direction==="none")directionCount[0] += 1;
+                    else{
+                        temp = data.direction;
+                directionCount[temp] += 1;}
+              })
+             .catch(error => console.error('Error fetching direction:', error));
+            end_time = new Date();
+            if(end_time - pre_time >= 1000){
+                pre_time = end_time;
+                //以一秒内出现次数最多的方向为此次食指的方向
+                temp = Object.keys(directionCount).reduce((a, b) => directionCount[a] > directionCount[b] ? a : b);
+                mediapipeDirection = parseInt(temp, 10);
+                //字典值清零
+                directionCount[5] = 0;
+                directionCount[6] = 0;
+                directionCount[8] = 0;
+                directionCount[9] = 0;
+                directionCount[0] = 0;
+                updateLetterDirection();
+             }
+        }, 50); // 10ms更新一次方向，实际应替换为适当的时间间隔
     </script>
 
 </body>

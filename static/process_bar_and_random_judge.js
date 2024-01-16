@@ -3,7 +3,7 @@
         var progressText = document.getElementById("progressText");
 
         var width = 1;
-        var duration = 5000; // 5秒
+        var duration = 8000; // 8秒
         var interval = 10; // 更新间隔
 
         var increment = (interval / duration) * 100;
@@ -20,6 +20,79 @@
 
         var progressInterval = setInterval(updateProgress, interval);
     }
+
+  //第二个进度条
+var is_hand = 0;
+var progressInterval1; // 将 progressInterval 定义在外部，以便全局访问
+
+function simulateProgress1() {
+    var progressBar = document.getElementById("myProgressBar1");
+    var progressText1 = document.getElementById("progressText1");
+
+    var height = 0;
+    var duration = 2000; // 5秒
+    var interval = 50; // 更新间隔
+
+    var increment = (interval / duration) * 100;
+
+    function updateProgress() {
+        if (height >= 100) {
+            clearInterval(progressInterval1);
+        } else {
+            if (is_hand === 1) {
+                height += increment;
+                progressBar.style.height = height + "%";
+                progressText1.innerHTML = Math.round(height) + "%";
+                //requestAnimationFrame(updateProgress); // 使用 requestAnimationFrame 更新
+            } else {
+                height=0;
+                progressBar.style.height = height + "%";
+                progressText1.innerHTML = Math.round(height) + "%";
+                //requestAnimationFrame(updateProgress); // 使用 requestAnimationFrame 更新
+            }
+        }
+    }
+
+
+    progressInterval1 = setInterval(updateProgress, interval);
+}
+
+// 示例：在 is_hand 从 0 变为 1 时开始运行进度条
+//is_hand = 0;
+//simulateProgress1();
+
+
+//  var is_hand = 1;
+//  function simulateProgress1() {
+//        var progressBar = document.getElementById("myProgressBar1");
+//        var progressText1 = document.getElementById("progressText1");
+//
+//        var height = 1;
+//        var duration = 5000; // 8秒
+//        var interval = 10; // 更新间隔
+//
+//        var increment = (interval / duration) * 100;
+//
+//        var updateProgress = function () {
+//            if (height >= 100) {
+//                clearInterval(progressInterval);
+//            } else {
+//                if(is_hand === 1){
+//                    height += increment;
+//                    progressBar.style.height = height + "%";
+//                    progressText1.innerHTML = Math.round(height) + "%";
+//                 }
+//                 else{
+//                    height = 0;
+//                    progressBar.style.height = '0';
+//                    clearInterval(progressInterval);
+//                 }
+//            }
+//        };
+//
+//        var progressInterval = setInterval(updateProgress, interval);
+//    }
+
 
         var error_count = 0;
         var vision = 0.0;
@@ -55,30 +128,16 @@
 
             if(error_count >= 2){
                 shouldExit = true;
-                 alert("视力评估结束！");
+                fetch('/api/close')
+        .then(response=>{
+        alert("视力评估结束！");})
+        .catch(error => console.error('Error:', error));
+
             }
             var dataToSend = {
                 "distance":distance,
                 "answer":answer
             }
-
-//            fetch('/api/return', {
-//                method: 'POST',
-//                headers: {
-//                    'Content-Type': 'application/json',
-//                },
-//                body: JSON.stringify(dataToSend),
-//                })
-//                .then(response => response.json())
-//                .then(data => {
-//                    if(data.exit === 1){
-//                        shouldExit = true;
-//                        alert("视力评估结束！");
-//                    }
-//                    //console.log('Success:', data);
-//                })
-//                .catch((error) => { console.error('Error:', error);});
-
 
             if (mediapipeDirection === E_direction) {
                 //改变E的方向
@@ -108,16 +167,28 @@
             4: 0
         }
 
-        simulateProgress();
+//        simulateProgress();
+
+        simulateProgress1();
+
         intervalId = setInterval(function () {
         console.log('exit:',shouldExit);
+
              fetch('/api/mediapipedirection')
                 .then(response => response.json())
                 .then(data => {
                 temp = data.direction;
-                directionCount[temp] += 1;
+                //没有检测到手,清空检测手的进度条
+                if(temp === 0){
+                    is_hand = 0;
+                }
+                else{
+                    is_hand = 1;
+                    directionCount[temp] += 1;
+                }
               })
              .catch(error => console.error('Error fetching direction:', error));
+
             end_time = new Date();
             if(end_time - pre_time >= 5000 && !shouldExit){
                 pre_time = end_time;
@@ -130,11 +201,16 @@
                 directionCount[3] = 0;
                 directionCount[4] = 0;
                 updateLetterDirection();
-                simulateProgress();
+
+//                simulateProgress();
+                clearInterval(progressInterval1);
+                simulateProgress1();
                 handleShouldExit();
              }
 
         }, 50); // 50ms更新一次方向
+
+
         var exitEvent = new Event('exitEvent');
 // 在适当的时候触发事件
         function handleShouldExit() {
@@ -146,5 +222,6 @@
         // 使用事件监听器监听事件
         document.addEventListener('exitEvent', function() {
             clearInterval(intervalId);
+            clearInterval(progressInterval1);
             console.log('周期函数结束');
         });
