@@ -160,10 +160,18 @@
             const letterE = document.getElementById('vision-test');
             letterE.style.fontSize = data.E_size + 'px';
             loadingMask.style.display = "none";
+            begin = 1;
+            if(begin === 1){
+            simulateProgress();
+            simulateProgress1();
+            console.log('进度条初始化完毕');
+        }
         })
         .catch(error => console.error('Error:', error));
         }
         init()
+        //摄像头加载完毕
+
 function calculateFontSize(score) {
     // 基本字体大小，您可以根据需要调整
     var baseSize = 10;
@@ -176,7 +184,6 @@ function calculateFontSize(score) {
 
     else return baseSize*5.3
 }
-// 在您
     </script>
 
 </body>
