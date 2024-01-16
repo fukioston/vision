@@ -184,8 +184,8 @@ function simulateProgress1() {
                 clearInterval(progressInterval);
                 clearInterval(progressInterval1);
 
-                simulateProgress1();
                 simulateProgress();
+                simulateProgress1();
                 handleShouldExit();
             }
             else{
@@ -200,9 +200,9 @@ function simulateProgress1() {
                     directionCount[2] = 0;
                     directionCount[3] = 0;
                     directionCount[4] = 0;
-                    clearInterval(intervalId);
-                    updateLetterDirection();
 
+                    updateLetterDirection();
+                    clearInterval(progressInterval);
                     clearInterval(progressInterval1);
                     simulateProgress();
                     simulateProgress1();
