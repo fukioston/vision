@@ -1,5 +1,4 @@
 var progressInterval;
-var begin = 0;
 var track_first_width = 0;
     function simulateProgress() {
         var progressBar = document.getElementById("myProgressBar");
@@ -30,13 +29,12 @@ var track_first_width = 0;
 var is_hand = 0;
 var track_second_height = 0;
 var progressInterval1; // 将 progressInterval 定义在外部，以便全局访问
-
 function simulateProgress1() {
     var progressBar = document.getElementById("myProgressBar1");
     var progressText1 = document.getElementById("progressText1");
 
     var height = 0;
-    var duration = 3000; // 5秒
+    var duration = 2000; // 5秒
     var interval = 50; // 更新间隔
 
     var increment = (interval / duration) * 100;
@@ -57,7 +55,6 @@ function simulateProgress1() {
                 track_second_height = height;
                 progressBar.style.height = height + "%";
                 progressText1.innerHTML = Math.round(height) + "%";
-                //requestAnimationFrame(updateProgress); // 使用 requestAnimationFrame 更新
             }
         }
     }
@@ -66,15 +63,44 @@ function simulateProgress1() {
     progressInterval1 = setInterval(updateProgress, interval);
 }
 
-//在 is_hand 从 0 变为 1 时开始运行进度条
+// 示例：在 is_hand 从 0 变为 1 时开始运行进度条
 //is_hand = 0;
 //simulateProgress1();
 
+
+//  var is_hand = 1;
+//  function simulateProgress1() {
+//        var progressBar = document.getElementById("myProgressBar1");
+//        var progressText1 = document.getElementById("progressText1");
+//
+//        var height = 1;
+//        var duration = 5000; // 8秒
+//        var interval = 10; // 更新间隔
+//
+//        var increment = (interval / duration) * 100;
+//
+//        var updateProgress = function () {
+//            if (height >= 100) {
+//                clearInterval(progressInterval);
+//            } else {
+//                if(is_hand === 1){
+//                    height += increment;
+//                    progressBar.style.height = height + "%";
+//                    progressText1.innerHTML = Math.round(height) + "%";
+//                 }
+//                 else{
+//                    height = 0;
+//                    progressBar.style.height = '0';
+//                    clearInterval(progressInterval);
+//                 }
+//            }
+//        };
+//
+//        var progressInterval = setInterval(updateProgress, interval);
+//    }
+
         var the_last_gesture = 0;
-        var is_green = 0;
-        var is_blue = 0;
-        var blue_error_count = 0;
-        var green_error_count = 0;
+        var error_count = 0;
         var vision = 0.0;
         var mediapipeDirection = 0;
         var E_direction = 1;
@@ -97,33 +123,23 @@ function simulateProgress1() {
             // 判断方向是否正确,正确则修改修改方向
             console.log("media:", typeof mediapipeDirection, mediapipeDirection);
             console.log("E:", typeof E_direction, E_direction);
-            var answer = 0;
-            var distance = 80;
             if (mediapipeDirection === E_direction){
                 answer = 1;
             }
             else{
-                if(is_blue){
-                    blue_error_count += 1;
-                }
-                else{
-                    if(is_green){
-                        green_error_count += 1;
-                    }
-                }
+                error_count += 1;
             }
 
-            if(blue_error_count >= 2 || green_error_count >= 1){
+            if(error_count >= 2){
                 shouldExit = true;
                 fetch('/api/close')
         .then(response=>{
-        alert("视力评估结束！");})
+        alert("视力评估结束！");
+        clearInterval(progressInterval1);
+        clearInterval(progressInterval);
+             handleShouldExit();})
         .catch(error => console.error('Error:', error));
 
-            }
-            var dataToSend = {
-                "distance":distance,
-                "answer":answer
             }
 
             if (mediapipeDirection === E_direction) {
@@ -151,7 +167,7 @@ function simulateProgress1() {
         var pre_time = new Date();
         var end_time = new Date();
         var temp = -1;
-        var ready=1;
+
         var directionCount = {
             1: 0,
             2: 0,
@@ -159,71 +175,49 @@ function simulateProgress1() {
             4: 0
         }
 
-        console.log("begin",begin);
-
-
-        //周期性地探测食指方向并检查进度条进度
         intervalId = setInterval(function () {
+             fetch('/api/mediapipedirection')
+                .then(response => response.json())
+                .then(data => {
+                temp = data.direction;
+                //没有检测到手,清空检测手的进度条
+                if(temp === 0){
+                    is_hand = 0;
+                }
+                else{
+                    is_hand = 1;
+                    the_last_gesture = temp;
+                }
+              })
+             .catch(error => console.error('Error fetching direction:', error));
 
-        console.log('exit:',shouldExit);
 
-            fetch('/api/mediapipedirection')
-               .then(response => response.json())
-               .then(data => {
-               temp = data.direction;
-               //没有检测到手,清空检测手的进度条
-               if(temp === 0){
-                   is_hand = 0;
-               }
-               else{
-                   is_hand = 1;
-                   the_last_gesture = temp;
-                   directionCount[temp] += 1;
-               }
-             })
-            .catch(error => console.error('Error fetching direction:', error));
+            if(track_first_width >= 100 && !shouldExit){
 
-            //食指方向保持时间已经满足
-            if(track_second_height >= 100 && !shouldExit){
-                console.log("蓝色进度条已满");
-                pre_time = end_time;
-                mediapipeDirection = the_last_gesture;
-
-                is_blue = 1;
-                updateLetterDirection();
-                is_blue = 0;
-                blue_error_count = 0;
-                clearInterval(progressInterval);
-                clearInterval(progressInterval1);
-
-                simulateProgress();
-                simulateProgress1();
-                handleShouldExit();
-            }
-            else{
-                if(track_first_width >= 100 && !shouldExit){//超时
-                    console.log("绿色进度条已满");
-                    pre_time = end_time;
-                    temp = Object.keys(directionCount).reduce((a, b) => directionCount[a] > directionCount[b] ? a : b);
-                    mediapipeDirection = the_last_gesture;
-
-                    //字典值清零
-                    directionCount[1] = 0;
-                    directionCount[2] = 0;
-                    directionCount[3] = 0;
-                    directionCount[4] = 0;
-
-                    is_green = 1;
-                    updateLetterDirection();
-                    is_green = 0;
-                    green_error_count = 0;
-                    clearInterval(progressInterval);
+                    track_first_width = 0;
+                    console.log('绿色进度条已满');
                     clearInterval(progressInterval1);
+                    mediapipeDirection = the_last_gesture;
+                    updateLetterDirection();
                     simulateProgress();
                     simulateProgress1();
-                    handleShouldExit();
-             }
+                }
+                else{
+                if(track_second_height >= 100 &&!shouldExit){
+                    track_second_height = 0;
+                   console.log('蓝色进度条已满');
+                   clearInterval(progressInterval);
+                   mediapipeDirection = the_last_gesture;
+                   updateLetterDirection();
+                   simulateProgress();
+                   simulateProgress1();
+//
+//
+//                   handleShouldExit();
+
+
             }
+                }
 
         }, 100); // 50ms更新一次方向
 
