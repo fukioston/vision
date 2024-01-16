@@ -141,7 +141,7 @@ function simulateProgress1() {
         var pre_time = new Date();
         var end_time = new Date();
         var temp = -1;
-
+        var ready=1;
         var directionCount = {
             1: 0,
             2: 0,
@@ -154,6 +154,7 @@ function simulateProgress1() {
 
         //周期性地探测食指方向并检查进度条进度
         intervalId = setInterval(function () {
+
         console.log('exit:',shouldExit);
 
             fetch('/api/mediapipedirection')
@@ -178,8 +179,7 @@ function simulateProgress1() {
                 pre_time = end_time;
                 mediapipeDirection = the_last_gesture;
 
-
-                 clearInterval(intervalId);
+                 // clearInterval(intervalId);
                  updateLetterDirection();
                 clearInterval(progressInterval);
                 clearInterval(progressInterval1);
@@ -209,7 +209,7 @@ function simulateProgress1() {
              }
             }
 
-        }, 50); // 50ms更新一次方向
+        }, 100); // 50ms更新一次方向
 
 
         var exitEvent = new Event('exitEvent');
