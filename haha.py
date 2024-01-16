@@ -28,13 +28,16 @@ with GestureRecognizer.create_from_options(options) as recognizer:
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
         recognition_result = recognizer.recognize_for_video(mp_image, frame_count)
         frame_count += 1
-        # cv2.imshow("HandsImage", frame)  # CV2窗体
-        # cv2.waitKey(1)  # 关闭窗体
-        print(recognition_result)
-        # if recognition_result.gestures:
-        #     top_gesture = recognition_result.gestures[0][0]
-        #     hand_landmarks = recognition_result.hand_landmarks
-        #     print(top_gesture)
+        # print(recognition_result)
+        if recognition_result:
+            if recognition_result.gestures:
+                t = recognition_result.gestures[0][0].category_name
+            else:
+                t = None
+        # print(t)
+        cv2.putText(frame, t, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.imshow("HandsImage", frame)  # CV2窗体
+        cv2.waitKey(1)  # 关闭窗体
 
 
     # cap.release()
