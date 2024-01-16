@@ -127,6 +127,13 @@ class HandDetector:
                     E_size = int(dist - dist % 20)
         return E_size
 
+    def release_camera(self):
+        # 释放摄像头资源
+        self.capture.release()
+
+    def initialize_camera(self):
+        # 重新初始化摄像头
+        self.capture = cv2.VideoCapture(0)
 
 class EyeDetector:
     def __init__(self):
