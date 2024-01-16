@@ -185,6 +185,7 @@ function simulateProgress1() {
                 clearInterval(progressInterval1);
 
                 simulateProgress1();
+                simulateProgress();
                 handleShouldExit();
             }
             else{
