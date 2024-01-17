@@ -189,9 +189,12 @@ function simulateProgress1() {
                 .then(data => {
                 temp = data.direction;
                 console.log(temp)
+                    if(the_last_gesture===-1)
+                        the_last_gesture=temp
                 //没有检测到手,清空检测手的进度条
-                if(temp === 0){
+                if(temp === 0||temp!==the_last_gesture){
                     is_hand = 0;
+                    the_last_gesture = temp;
                 }
                 else{
                     is_hand = 1;
