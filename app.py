@@ -74,11 +74,13 @@ def get_direction22():
     x = get_direction2()
     if x:
         return x
+    else:
+        return jsonify({'direction': 0})
 
 
-error_count = 0
-pre_size = -1
-best_vision = -1
+# error_count = 0
+# pre_size = -1
+# best_vision = -1
 
 
 # @app.route('/api/return', methods=['POST', 'GET'])

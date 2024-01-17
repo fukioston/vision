@@ -103,6 +103,7 @@ function simulateProgress1() {
         var error_count = 0;
         var vision = 0.0;
         var mediapipeDirection = 0;
+        var pre_mediapipeDirection = 0;
         var E_direction = 1;
         var flag = false; //判断标志位
         var shouldExit = false; // 周期函数结束标志位
@@ -189,13 +190,23 @@ function simulateProgress1() {
                 .then(response => response.json())
                 .then(data => {
                 temp = data.direction;
+                 if(the_last_gesture===-1)
+                    the_last_gesture=temp
                 //没有检测到手,清空检测手的进度条
                 if(temp === 0){
                     is_hand = 0;
                 }
-                else{
+                else{//检测到手
                     is_hand = 1;
-                    the_last_gesture = temp;
+                    the_last_gesture = temp;//记录当前手的姿势
+                    if(the_last_gesture === pre_mediapipeDirection){//前后两次手的姿势相同
+                         is_hand = 1;
+                         pre_mediapipeDirection = the_last_gesture;
+                    }
+                    else{//前后两次手的姿势不同
+                         is_hand = 0;
+                         pre_mediapipeDirection = the_last_gesture;
+                    }
                 }
               })
              .catch(error => console.error('Error fetching direction:', error));

@@ -190,7 +190,7 @@ function simulateProgress1() {
                 else{//检测到手
                     is_hand = 1;
                     the_last_gesture = temp;//记录当前手的姿势
-                    if(the_last_gesture === the_last_gesture){//前后两次手的姿势相同
+                    if(the_last_gesture === pre_mediapipeDirection){//前后两次手的姿势相同
                          is_hand = 1;
                          pre_mediapipeDirection = the_last_gesture;
                     }
