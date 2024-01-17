@@ -120,6 +120,7 @@ function simulateProgress1() {
             };
 
 
+
             // 判断方向是否正确,正确则修改修改方向
             console.log("media:", typeof mediapipeDirection, mediapipeDirection);
             console.log("E:", typeof E_direction, E_direction);
@@ -188,13 +189,9 @@ function simulateProgress1() {
                 .then(response => response.json())
                 .then(data => {
                 temp = data.direction;
-                console.log(temp)
-                    if(the_last_gesture===-1)
-                        the_last_gesture=temp
                 //没有检测到手,清空检测手的进度条
-                if(temp === 0||temp!==the_last_gesture){
+                if(temp === 0){
                     is_hand = 0;
-                    the_last_gesture = temp;
                 }
                 else{
                     is_hand = 1;

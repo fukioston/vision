@@ -158,6 +158,10 @@ def get_direction2():
                 if t:
                     data = {'direction': int(t)}
                     return jsonify(data)
+                else:
+                    data = {'direction': 0}
+                    return jsonify(data)
+
     return None
 
 
