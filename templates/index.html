@@ -178,7 +178,7 @@ function calculateFontSize(score) {
     console.log(score)
     var a={4.0: 14, 4.1: 12, 4.2: 11, 4.3: 10, 4.4: 9, 4.5: 8.5, 4.6: 7.5, 4.7: 6.6, 4.8: 6, 4.9: 5, 5.0: 4, 5.1: 3, 5.2: 2, 5.3: 1.5}
     if(a[score.toFixed(1)])
-    {console.log("cnm"+a[score.toFixed(1)])
+    {
         return baseSize *a[score.toFixed(1)];
     }
 
