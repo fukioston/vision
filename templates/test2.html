@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>camera</title>
-
+<link rel="stylesheet" href="../static/css/sweetalert2.min.css">
+<link rel="stylesheet" href="../static/css/tailwind.min.css">
     <style>
     .con{
            float:left;
@@ -135,6 +136,12 @@
 <div id="loadingMask" class="loading-mask">
     加载摄像头中...
 </div>
+<script src="../static/plugins/bootstrap-4.4.1-dist/js/bootstrap.bundle.js"></script>
+<script src="../static/js/sweetalert2.all.min.js"></script>
+<script src="../static/js/sweetalert2.min.js"></script>
+<script src="../static/js/jquery-3.6.0.min.js"></script>
+<script src="../static/plugins/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script src="../static/process_bar_and_random_judge.js"></script>
 <script src="../static/process_bar_and_random_judge2.js"></script>
 <script>
            let begin = 0;
@@ -176,6 +183,55 @@ function calculateFontSize(score) {
 
     else return baseSize*5.3
 }
+(function($) {
+  showSwal = function(type) {
+
+     if (type === 'success-message') {
+         swalWithBootstrapButtons=Swal.mixin({
+  customClass: {
+    confirmButton: 'btn btn-success',
+    cancelButton: 'btn btn-danger'
+  },
+  buttonsStyling: false
+})
+
+swalWithBootstrapButtons.fire({
+  title: '视力检测结束',
+  text: "还要再来一次吗",
+  icon: 'warning',
+  showCancelButton: true,
+  confirmButtonText: '是的!',
+  cancelButtonText: '返回主页',
+  reverseButtons: true
+}).then((result) => {
+  if (result.value) {
+    swalWithBootstrapButtons.fire(
+      '好的!',
+      '再次测试',
+      'success'
+    ).then((result)=>{
+        window.location.href='/index';
+    })
+  } else if (
+    /* Read more about handling dismissals below */
+    result.dismiss === Swal.DismissReason.cancel
+  ) {
+    swalWithBootstrapButtons.fire(
+      '好的',
+      '返回主页',
+      'success'
+    ).then((result)=>{
+        window.location.href='/';
+    })
+  }
+})
+         }
+    else{
+        swal("Error occured !");
+    }
+  }
+
+})(jQuery);
     </script>
 
 </body>

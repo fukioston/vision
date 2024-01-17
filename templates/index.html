@@ -127,7 +127,7 @@
     <div id="vision-test">
         E
     </div>
-<button id="btnConfirm" type="button" onclick="showSwal('success-message')" class="btn btn-dark mx-auto" style="width:45%">确认申请</button>
+
 <!--第二个进度条-->
 <div class="container1">
     <div class="progress-container1">
@@ -190,7 +190,7 @@ function calculateFontSize(score) {
     else return baseSize*5.3
 }
 (function($) {
-  showSwal = function(type) {
+  showSwal = function(type, message) {
 
      if (type === 'success-message') {
          swalWithBootstrapButtons=Swal.mixin({
@@ -202,31 +202,33 @@ function calculateFontSize(score) {
 })
 
 swalWithBootstrapButtons.fire({
-  title: 'Are you sure?',
-  text: "确定要成为管理员吗？",
+  title: '视力检测结束',
+  text: message,
   icon: 'warning',
   showCancelButton: true,
   confirmButtonText: '是的!',
-  cancelButtonText: '我再考虑一下',
+  cancelButtonText: '返回主页',
   reverseButtons: true
 }).then((result) => {
   if (result.value) {
     swalWithBootstrapButtons.fire(
-      '申请成功!',
-      '恭喜你成为管理员',
+      '好的!',
+      '再次测试',
       'success'
     ).then((result)=>{
-        window.location.href='/column/catalog';
+        window.location.href='/index';
     })
   } else if (
     /* Read more about handling dismissals below */
     result.dismiss === Swal.DismissReason.cancel
   ) {
     swalWithBootstrapButtons.fire(
-      '申请失败',
-      '没事！考虑好了可以再申请 :)',
-      'error'
-    )
+      '好的',
+      '返回主页',
+      'success'
+    ).then((result)=>{
+        window.location.href='/';
+    })
   }
 })
          }

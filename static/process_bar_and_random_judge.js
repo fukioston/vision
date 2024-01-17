@@ -135,7 +135,7 @@ function simulateProgress1() {
                 shouldExit = true;
                 fetch('/api/close')
         .then(response=>{
-        alert("视力评估结束！");
+        showSwal('success-message',"你的结果是"+score+",还要再来一次吗");
         clearInterval(progressInterval1);
         clearInterval(progressInterval);
              handleShouldExit();})
