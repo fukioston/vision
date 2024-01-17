@@ -28,12 +28,12 @@ with GestureRecognizer.create_from_options(options) as recognizer:
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
         recognition_result = recognizer.recognize_for_video(mp_image, frame_count)
         frame_count += 1
-        # print(recognition_result)
         if recognition_result:
             if recognition_result.gestures:
                 t = recognition_result.gestures[0][0].category_name
             else:
-                t = None
+                t = "none"
+            print(t)
         # print(t)
         cv2.putText(frame, t, (50, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
         cv2.imshow("HandsImage", frame)  # CV2窗体

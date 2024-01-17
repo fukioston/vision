@@ -161,8 +161,8 @@ def get_direction2():
                 else:
                     data = {'direction': 0}
                     return jsonify(data)
-
-    return None
+    data = {'direction': 0}
+    return jsonify(data)
 
 
 def gen_frames0(detector=detector_):

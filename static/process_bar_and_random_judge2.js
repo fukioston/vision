@@ -1,10 +1,10 @@
 var progressInterval;
 var track_first_width = 0;
+var width = 1;
     function simulateProgress() {
         var progressBar = document.getElementById("myProgressBar");
         var progressText = document.getElementById("progressText");
 
-        var width = 1;
         var duration = 8000; // 8秒
         var interval = 10; // 更新间隔
 
@@ -29,11 +29,12 @@ var track_first_width = 0;
 var is_hand = 0;
 var track_second_height = 0;
 var progressInterval1; // 将 progressInterval 定义在外部，以便全局访问
+ var height = 0;
 function simulateProgress1() {
     var progressBar = document.getElementById("myProgressBar1");
     var progressText1 = document.getElementById("progressText1");
 
-    var height = 0;
+
     var duration = 2000; // 5秒
     var interval = 50; // 更新间隔
 
@@ -63,7 +64,6 @@ function simulateProgress1() {
     progressInterval1 = setInterval(updateProgress, interval);
 }
 
-// 示例：在 is_hand 从 0 变为 1 时开始运行进度条
 //is_hand = 0;
 //simulateProgress1();
 
@@ -104,7 +104,7 @@ function simulateProgress1() {
         var vision = 0.0;
         var mediapipeDirection = 0;
         var pre_mediapipeDirection = 0;
-        var E_direction = 1;
+        var E_direction =8;
         var flag = false; //判断标志位
         var shouldExit = false; // 周期函数结束标志位
 
@@ -190,21 +190,22 @@ function simulateProgress1() {
                 .then(response => response.json())
                 .then(data => {
                 temp = data.direction;
-                 if(the_last_gesture===-1)
-                    the_last_gesture=temp
+
                 //没有检测到手,清空检测手的进度条
                 if(temp === 0){
                     is_hand = 0;
+                    console.log('没检测到手:',is_hand);
                 }
                 else{//检测到手
                     is_hand = 1;
+                    console.log('姿势相同:',is_hand);
                     the_last_gesture = temp;//记录当前手的姿势
                     if(the_last_gesture === pre_mediapipeDirection){//前后两次手的姿势相同
-                         is_hand = 1;
                          pre_mediapipeDirection = the_last_gesture;
                     }
                     else{//前后两次手的姿势不同
                          is_hand = 0;
+                         console.log('姿势不同:',is_hand);
                          pre_mediapipeDirection = the_last_gesture;
                     }
                 }
@@ -216,6 +217,7 @@ function simulateProgress1() {
 
                     track_first_width = 0;
                     console.log('绿色进度条已满');
+                     width=1;height=0;
                     clearInterval(progressInterval1);
                     mediapipeDirection = the_last_gesture;
                     updateLetterDirection();
@@ -226,6 +228,7 @@ function simulateProgress1() {
                 if(track_second_height >= 100 &&!shouldExit){
                     track_second_height = 0;
                    console.log('蓝色进度条已满');
+                    width=1;height=0;
                    clearInterval(progressInterval);
                    mediapipeDirection = the_last_gesture;
                    updateLetterDirection();
@@ -239,7 +242,7 @@ function simulateProgress1() {
             }
                 }
 
-        }, 100); // 50ms更新一次方向
+        }, 200); // 50ms更新一次方向
 
 
         var exitEvent = new Event('exitEvent');
