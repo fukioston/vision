@@ -202,11 +202,153 @@
             }
         }
 
+        .modal {
+            display: none; /* 默认隐藏 */
+            position: fixed; /* 固定位置 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 全屏宽度 */
+            height: 100%; /* 全屏高度 */
+            background: rgba(0, 0, 0, 0.6); /* 半透明背景 */
+             z-index: 9999; /* 高 z-index 值确保它在最上面 */
+
+        }
+
+        /* 弹窗内容样式 */
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; /* 居中显示 */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* 宽度 */
+        }
+
+        /* 关闭按钮样式 */
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .teach_img{
+            width: 200px;
+        }
+ .tutorial-images {
+    font-size: 0; /* 修复内联块间隙 */
+}
+
+.image-container {
+    width: 23%; /* 每个容器占据总宽度的25% */
+    display: inline-block; /* 使用内联块布局 */
+    font-size: 16px; /* 重置字体大小 */
+    text-align: center; /* 文本居中 */
+}
+
+.image-container img {
+    width: 100%; /* 图片宽度为容器的100% */
+    max-width: 200px; /* 限制最大宽度 */
+    height: 200px; /* 保持图片比例 */
+    margin: auto; /* 水平居中 */
+    display: block; /* 图片显示为块级元素 */
+}
+
+.image-container p {
+    margin-top: 5px; /* 文字上方的间隙 */
+}
+.all{
+     overflow: auto; /* 在内容超出时显示滚动条 */
+            max-height: 65vh; /* 设置最大高度为视窗高度的80% */
+}
+.teach_img2{
+    width: 800px;
+    height:600px;
+}
+
+
     </style>
 </head>
 
 <body>
+   <div id="myModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <div class="all">
+             <h1>一.手势识别示例</h1>
+        <div class="tutorial-images">
+            <div class="image-container">
+                <img class="teach_img" src="../static/images/up.png" alt="教程图1">
+                <p>向上(字母视力表)</p>
+            </div>
+            <div class="image-container">
+               <img class="teach_img" src="../static/images/down.png" alt="教程图2">
+                <p>向下(字母视力表)</p>
+            </div>
+            <div class="image-container">
+                <img class="teach_img" src="../static/images/left.png" alt="教程图1">
+                <p>向左(字母视力表)</p>
+            </div>
+            <div class="image-container">
+                <img class="teach_img" src="../static/images/right.png" alt="教程图1">
+                <p>向右(字母视力表)</p>
+            </div>
+             <div class="image-container">
+                <img class="teach_img" src="../static/images/5.png" alt="教程图1">
+                <p>5(数字视力表)</p>
+            </div>
+            <div class="image-container">
+               <img class="teach_img" src="../static/images/6.png" alt="教程图2">
+                <p>6(数字视力表)</p>
+            </div>
+            <div class="image-container">
+                <img class="teach_img" src="../static/images/8.png" alt="教程图1">
+                <p>8(数字视力表)</p>
+            </div>
+            <div class="image-container">
+                <img class="teach_img" src="../static/images/9.png" alt="教程图1">
+                <p>9(数字视力表)</p>
+            </div>
+
+        </div>
+             <h1>二.使用示例</h1>
+         <div class="tutorial-images">
+            <div class="image-container">
+                <img class="teach_img" src="../static/images/use1.png" alt="教程图1">
+                <p>选择视力表</p>
+            </div>
+            <div class="image-container">
+               <img class="teach_img" src="../static/images/use2.png" alt="教程图2">
+                <p>初始化摄像头与测试距离测量</p>
+            </div>
+            <div class="image-container">
+                <img class="teach_img" src="../static/images/use3.png" alt="教程图1">
+                <p>开始测量</p>
+            </div>
+            <div class="image-container">
+                <img class="teach_img" src="../static/images/use4.png" alt="教程图1">
+                <p>比出对应手势系统判定对错</p>
+            </div>
+             <div class="image-container">
+                <img class="teach_img" src="../static/images/use5.png" alt="教程图1">
+                <p>结果显示</p>
+            </div>
+        </div>
+             <h1>三.界面符号介绍</h1>
+
+                <img class="teach_img2" src="../static/images/user6.png" alt="教程图1">
+
+        </div>
+        </div>
+    </div>
+</div>
     <div>
+
         <script type="module">
             // 导入三维模型库
             import * as THREE from "https://cdn.skypack.dev/three@0.136.0";
@@ -390,18 +532,19 @@
     <div class="content">
         <h1>Welcome to My Eyesight Test</h1>
         <button class="btn" id="myButton">
-            Click to Start
+            字母视力表测试
         </button>
         <button class="btn" id="myButton2">
-            Click to Start2
+           数字视力表测试
         </button>
 
         <!-- 可以继续添加其他内容 -->
     </div>
-    <div class="tooltip-container">
-        <span class="tooltip">When you click to start,the website will open your camera and take your video</span>
-        <span class="text">Help Here👋</span>
-        <span>Tooltip 👆</span>
+    <div class="tooltip-container" id="teach">
+
+        <span >使用教程</span>
+        <span></span>
+{#        <span class="tooltip">点击查看具体使用教程</span>#}
     </div>
 
     <script>
@@ -418,6 +561,32 @@
     button2.addEventListener("click", function () {
         // 在这里执行跳转逻辑
         window.location.href = "test2"; } )
+    var modal = document.getElementById("myModal");
+
+var span = document.getElementsByClassName("close")[0];
+
+document.addEventListener('DOMContentLoaded', function() {
+    var teachElement = document.getElementById('teach');
+    {#var tutorialElement = document.getElementById('tutorial');#}
+
+    teachElement.addEventListener('click', function() {
+        // 切换教程的可见性
+        console.log("sss")
+       modal.style.display = "block";
+
+    });
+});
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+// 点击弹窗外区域关闭弹窗
+window.onclick = function(event) {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+}
+
 
     </script>
 
