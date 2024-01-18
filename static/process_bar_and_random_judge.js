@@ -175,7 +175,8 @@ function simulateProgress1() {
                 var scoreDisplay = document.getElementById("score-display");
                 scoreDisplay.innerText = "Score: " + score.toFixed(1);
                 var fontSize = calculateFontSize(score);
-                letterE.style.fontSize = fontSize + 'px';
+                letterE.style.width = fontSize + 'px';
+                letterE.style.height = fontSize + 'px';
                 // 在这里使用返回的角度来改变字母E的方向
                 const dynamicLetter = document.getElementById('vision-test');
                 E_direction = data.rotation_angle;

@@ -17,7 +17,8 @@
         /*视力表E的样式*/
         #vision-test {
             font-family: Arial, sans-serif;
-            font-size: 48px;
+            width: 48px;
+            height:48px;
             line-height: 1.0;
             text-align: center;
             transition: transform 0.1s ease-in-out;
@@ -207,7 +208,7 @@
                     <div class="container">
                         <!--显示视力表字母E-->
     <div id="vision-test">
-        E
+        <img src="../static/images/sign.png">
     </div>
                     </div>
                 </div>
@@ -257,7 +258,8 @@
             const letterE = document.getElementById('vision-test');
             mm_px=getOneMmsPx ()
             initsize=data.E_size*mm_px
-            letterE.style.fontSize = data.E_size*mm_px + 'px';
+            letterE.style.width= data.E_size*mm_px + 'px';
+            letterE.style.height= data.E_size*mm_px + 'px';
             loadingMask.style.display = "none";
             begin = 1;
             if(begin === 1){
