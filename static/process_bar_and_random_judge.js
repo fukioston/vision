@@ -16,12 +16,12 @@ var width = 1;
         var updateProgress = function () {
             if (width >= 100) {
                 track_first_width = width;
-                console.log('width',width);
+
                 clearInterval(progressInterval);
             } else {
                 width += increment;
                 track_first_width = width;
-                console.log('width',width);
+
                 root.style.setProperty("--width",width + "%");
                 //progressText.innerHTML = Math.round(width) + "%";
             }
@@ -129,8 +129,7 @@ function simulateProgress1() {
 
 
             // 判断方向是否正确,正确则修改修改方向
-            console.log("media:", typeof mediapipeDirection, mediapipeDirection);
-            console.log("E:", typeof E_direction, E_direction);
+
             if (mediapipeDirection === E_direction){
                 answer = 1;
                 root.style.setProperty('--color','green');
@@ -214,16 +213,16 @@ function simulateProgress1() {
 
                          if (temp === 0) {
                              is_hand = 0;
-                             // console.log('没检测到手:',is_hand);
+
                          } else {//检测到手
                              is_hand = 1;
-                             // console.log('姿势相同:',is_hand);
+
                              the_last_gesture = temp;//记录当前手的姿势
                              if (the_last_gesture === pre_mediapipeDirection) {//前后两次手的姿势相同
                                  pre_mediapipeDirection = the_last_gesture;
                              } else {//前后两次手的姿势不同
                                  is_hand = 0;
-                                 // console.log('姿势不同:',is_hand);
+
                                  pre_mediapipeDirection = the_last_gesture;
                              }
                          }
@@ -234,7 +233,7 @@ function simulateProgress1() {
                  if (track_first_width >= 100 && !shouldExit) {
 
                      track_first_width = 0;
-                     console.log('绿色进度条已满');
+
                      width=1;height=0;
                      clearInterval(progressInterval1);
                      mediapipeDirection = the_last_gesture;
@@ -244,7 +243,7 @@ function simulateProgress1() {
                  } else {
                      if (track_second_height >= 100 && !shouldExit) {
                          track_second_height = 0;
-                         console.log('蓝色进度条已满');
+
                          width=1;height=0;
                          clearInterval(progressInterval);
                          mediapipeDirection = the_last_gesture;
@@ -272,5 +271,5 @@ function simulateProgress1() {
             clearInterval(intervalId);
             clearInterval(progressInterval);
             clearInterval(progressInterval1);
-            console.log('周期函数结束');
+
         });
