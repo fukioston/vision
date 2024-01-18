@@ -118,14 +118,16 @@ class HandDetector:
                 W = 6.3  # 人脸两眼之间的平均距离是6.3cm
                 foucs = 650  # 摄像头焦距
                 dist = int((foucs * W) / w)  # 计算距离
-
+                x5=72.7074
+                x5=(dist/500)*72.7074
+                # 这里是毫米传回去大小
                 if dist < 60:  # 返回字号大小
                     E_size = 40
                 elif dist > 1000:
                     E_size = 800
                 else:
                     E_size = int(dist - dist % 20)
-        return E_size
+                return x5
 
     def release_camera(self):
         # 释放摄像头资源

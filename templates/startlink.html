@@ -548,6 +548,18 @@
     </div>
 
     <script>
+            function getOneMmsPx (){
+		// 创建一个1mm宽的元素插入到页面，然后坐等出结果
+		let div = document.createElement("div");
+		div.id = "mm";
+		div.style.width = "1mm";
+		document.querySelector("body").appendChild(div);
+		// 原生方法获取浏览器对元素的计算值
+		let mm1 = document.getElementById("mm").getBoundingClientRect();
+		console.log(mm1);
+		return mm1.width;
+	}
+    getOneMmsPx ()
     // 获取按钮元素
     var button = document.getElementById("myButton");
 
@@ -582,6 +594,7 @@ span.onclick = function() {
 
 // 点击弹窗外区域关闭弹窗
 window.onclick = function(event) {
+
     if (event.target === modal) {
         modal.style.display = "none";
     }
