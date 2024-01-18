@@ -1,5 +1,6 @@
 var progressInterval;
 var track_first_width = 0;
+var root=document.documentElement;
 var width = 1;
     function simulateProgress() {
         var progressBar = document.getElementById("myProgressBar");
@@ -17,8 +18,7 @@ var width = 1;
             } else {
                 width += increment;
                 track_first_width = width;
-                progressBar.style.width = width + "%";
-                progressText.innerHTML = Math.round(width) + "%";
+                root.style.setProperty("--width",width + "%");
             }
         };
 
@@ -48,14 +48,12 @@ function simulateProgress1() {
             if (is_hand === 1) {
                 height += increment;
                 track_second_height = height;
-                progressBar.style.height = height + "%";
-                progressText1.innerHTML = Math.round(height) + "%";
+                root.style.setProperty("--height",(height*3) + "px") ;
                 //requestAnimationFrame(updateProgress); // 使用 requestAnimationFrame 更新
             } else {
                 height=0;
                 track_second_height = height;
-                progressBar.style.height = height + "%";
-                progressText1.innerHTML = Math.round(height) + "%";
+                root.style.setProperty("--height",0 + "px") ;
             }
         }
     }
@@ -128,16 +126,23 @@ function simulateProgress1() {
             console.log(mediapipeDirection === E_direction)
             if (mediapipeDirection === E_direction){
                 answer = 1;
+                console.log('here');
+                root.style.setProperty('--color','green');
+                root.style.setProperty('--backimage','none');
             }
             else{
                 error_count += 1;
+                console.log('here');
+                root.style.setProperty('--color','red');
+                root.style.setProperty('--backimage','none');
             }
 
             if(error_count >= 2){
                 shouldExit = true;
                 fetch('/api/close')
         .then(response=>{
-        alert("视力评估结束！");
+        // alert("视力评估结束！");
+            showSwal('success-message',"你的结果是"+score.toFixed(1)+",还要再来一次吗");
         clearInterval(progressInterval1);
         clearInterval(progressInterval);
              handleShouldExit();})
@@ -159,6 +164,20 @@ function simulateProgress1() {
                 .then(response => response.json())
                 .then(data => {
                     score+=0.1;
+                    if(score>5.2)
+                    {
+                        shouldExit=true;
+                        fetch('/api/close')
+        .then(response=>{
+        // alert("视力评估结束！");
+            showSwal('success-message',"你的结果是"+score.toFixed(1)+",还要再来一次吗");
+        clearInterval(progressInterval1);
+        clearInterval(progressInterval);
+             handleShouldExit();})
+        .catch(error => console.error('Error:', error));
+                        }
+
+
                 var scoreDisplay = document.getElementById("score-display");
                 scoreDisplay.innerText = "Score: " + score.toFixed(1);
                 var fontSize = calculateFontSize(score);

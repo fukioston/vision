@@ -20,12 +20,69 @@
             text-align: center;
             transition: transform 0.1s ease-in-out;
         }
-     .container {
-    position: relative;
-    float: left;
-    height: 500px; /* 调整为所需尺寸 */
-    width: 500px; /* 调整为所需尺寸 */
+     .loading-mask {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
+    color: white;
+    display: grid;
+    place-items: center;
+    z-index: 9999; /* 确保它位于页面最上方 */
 }
+     :root {
+            --height: 0px;
+            --width: 0%;
+            --color: none;
+            --backimage:linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+        }
+        .column {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-flow:column;
+        }
+        h3{
+            color:white;
+        }
+        .content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10%;
+        }
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            /* 背景渐变 */
+            background-image: linear-gradient(-225deg,#160016 0%, #0e0d18 29%, #000000 100%);
+        }
+        canvas {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+        }
+        .container {
+            display: flex;
+            justify-content: center;
+            flex: 1;
+            position: relative;
+            float: left;
+            height: 100%; /* 调整为所需尺寸 */
+            width: 100%; /* 调整为所需尺寸 */
+            align-items: center; /* 新增的样式 */
+        }
 
 .video-stream {
     width: 100%;
@@ -43,94 +100,114 @@
     background-size: cover; /* 覆盖整个容器 */
     z-index: 100; /* 确保覆盖层在顶层 */
 }
-.progress-container {
+        .card1 {
+            justify-content: center;
+            align-items: center;
+            width: 300px;
+            height: 300px;
+            border-radius: 20px;
+            padding: 5px;
+            box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+            background-color:var(--color);
+            background-image: var(--backimage);
+        }
+        .card2 {
+            width: 300px;
+            height: 300px;
+            border-radius: 20px;
+            padding: 4px;
+            box-shadow: rgba(151, 65, 252, 0.2) 0 15px 30px -5px;
+            background-image: linear-gradient(144deg,#AF40FF, #5B42F3 50%,#00DDEB);
+        }
+        .card__content {
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            background: white;
+            border-radius: 17px;
             width: 100%;
-            background-color: #f1f1f1;
-            border: 1px solid #ddd;
-            height: 30px;
-            position: relative;
-        }
-
-        .progress-bar {
             height: 100%;
-            background-color: #4caf50;
-            width: 0;
+            overflow: hidden;
+        }
+        .loader {
+            margin-bottom: 10%;
+            width: 70%;
+            height: 10px;
+            border-radius: 2px;
+            background-color: rgba(0, 0, 0, 0.2);
             position: absolute;
-            z-index: 1;
         }
 
-        .progress-text {
-            text-align: center;
-            line-height: 30px;
-            color: #333;
-            z-index: 2;
-        }
-
+            .loader::before {
+                content: "";
+                position: absolute;
+                background-color: rgb(9, 188, 9);
+                width: var(--width);
+                height: 100%;
+                border-radius: 2px;
+                box-shadow: rgb(9, 188, 9) 0px 2px 29px 0px;
+            }
 
         .container1 {
-            position: relative;
+            flex: 1;
             float: left;
-            height: 500px; /* 调整为所需尺寸 */
-            width: 500px; /* 调整为所需尺寸 */
+            align-items: center;
+            margin-bottom: 10%;
+            display: flex;
+            justify-content: center;
         }
 
-        .progress-container1 {
-            position: relative;
-            height: 100%; /* 使用相对父容器的百分比高度 */
-            width: 50px; /* 调整为所需尺寸 */
-        }
-
-        .progress-bar1 {
-            height: 0;
-            width: 100%;
-            background-color: #3498db;
+        .progress-loader {
+            top: 50%;
+            left: 25%;
             position: absolute;
-            bottom: 0;
-            transition: height 0.01s linear; /* 过渡效果 */
+            transform: translate(-50%, -50%);
+            width: 10px; /* 调整为纵向的宽度 */
+            background: rgba(236, 236, 238, 0.253);
+            height: 300px; /* 调整为纵向的高度 */
+            border-radius: 7px;
         }
 
-        .progress-text {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
+        .progress {
+            margin-top: calc(300px - var(--height));
+            width: 10px; /* 调整为纵向的宽度 */
+            height: var(--height); /* 调整为纵向的高度 */
+            border-radius: 7px;
+            background: rgb(255, 255, 255);
+            transition: 0.05s;
         }
-        .loading-mask {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* 半透明背景 */
-    color: white;
-    display: grid;
-    place-items: center;
-    z-index: 9999; /* 确保它位于页面最上方 */
-}
-
     </style>
 
 </head>
 
 <body>
-<div class="progress-container">
-    <div class="progress-bar" id="myProgressBar"></div>
-    <div class="progress-text" id="progressText">0%</div>
-</div>
-<!--显示视力表字母E-->
+
+
+
+<div class="content">
+        <div class="container1">
+            <div class="loader"></div>
+        </div>
+
+        <div class="progress-loader">
+            <div class="progress"></div>
+        </div>
+        <div class="column">
+            <h3>请集中注意看这里</h3>
+            <div class="card1">
+                <div class="card__content">
+                    <div class="container">
+                        <!--显示视力表字母E-->
     <div id="vision-test">
         8
     </div>
-<div class="container1">
-    <div class="progress-container1">
-        <div class="progress-bar1" id="myProgressBar1"></div>
-        <div class="progress-text" id="progressText1">0%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</div>
-<h3>接受传输来的视频</h3>
-<div class="con">
-    <img src="{{url_for('video_feed0')}}" alt="" width="100%">
-</div>
 <!-- 显示分数 -->
 <div id="score-display">Score: 4.0</div>
 <div id="loadingMask" class="loading-mask">
@@ -183,20 +260,22 @@ function calculateFontSize(score) {
     else return baseSize*5.3
 }
 (function($) {
-  showSwal = function(type) {
+  showSwal = function(type, message) {
 
      if (type === 'success-message') {
          swalWithBootstrapButtons=Swal.mixin({
   customClass: {
-    confirmButton: 'btn btn-success',
-    cancelButton: 'btn btn-danger'
+    confirmButton: 'btn',
+       {#btn-success#}
+       {#btn-danger#}
+    cancelButton: 'btn'
   },
-  buttonsStyling: false
+  buttonsStyling: true
 })
 
 swalWithBootstrapButtons.fire({
   title: '视力检测结束',
-  text: "还要再来一次吗",
+  text: message,
   icon: 'warning',
   showCancelButton: true,
   confirmButtonText: '是的!',

@@ -1,6 +1,7 @@
 var progressInterval;
 var track_first_width = 0;
 var isProcessing = false;
+var root=document.documentElement;
 var width = 1;
     function simulateProgress() {
         var progressBar = document.getElementById("myProgressBar");
@@ -15,12 +16,14 @@ var width = 1;
         var updateProgress = function () {
             if (width >= 100) {
                 track_first_width = width;
+                console.log('width',width);
                 clearInterval(progressInterval);
             } else {
                 width += increment;
                 track_first_width = width;
-                progressBar.style.width = width + "%";
-                progressText.innerHTML = Math.round(width) + "%";
+                console.log('width',width);
+                root.style.setProperty("--width",width + "%");
+                //progressText.innerHTML = Math.round(width) + "%";
             }
         };
 
@@ -50,14 +53,15 @@ function simulateProgress1() {
             if (is_hand === 1) {
                 height += increment;
                 track_second_height = height;
-                progressBar.style.height = height + "%";
-                progressText1.innerHTML = Math.round(height) + "%";
+                root.style.setProperty("--height",(height*3) + "px") ;
+                //progressBar.style.height = height + "%";
+                //progressText1.innerHTML = Math.round(height) + "%";
                 //requestAnimationFrame(updateProgress); // 使用 requestAnimationFrame 更新
             } else {
                 height=0;
                 track_second_height = height;
-                progressBar.style.height = height + "%";
-                progressText1.innerHTML = Math.round(height) + "%";
+                root.style.setProperty("--height",0+ "px") ;
+                //progressText1.innerHTML = Math.round(height) + "%";
             }
         }
     }
@@ -129,16 +133,20 @@ function simulateProgress1() {
             console.log("E:", typeof E_direction, E_direction);
             if (mediapipeDirection === E_direction){
                 answer = 1;
+                root.style.setProperty('--color','green');
+                root.style.setProperty('--backimage','none');
             }
             else{
                 error_count += 1;
+                root.style.setProperty('--color','red');
+                root.style.setProperty('--backimage','none');
             }
 
             if(error_count >= 2){
                 shouldExit = true;
                 fetch('/api/close')
         .then(response=>{
-        showSwal('success-message',"你的结果是"+score+",还要再来一次吗");
+        showSwal('success-message',"你的结果是"+score.toFixed(1)+",还要再来一次吗");
         clearInterval(progressInterval1);
         clearInterval(progressInterval);
              handleShouldExit();})
@@ -152,6 +160,18 @@ function simulateProgress1() {
                 .then(response => response.json())
                 .then(data => {
                     score+=0.1;
+                    if(score>5.2)
+                    {
+                        shouldExit=true;
+                        fetch('/api/close')
+        .then(response=>{
+        // alert("视力评估结束！");
+            showSwal('success-message',"你的结果是"+score.toFixed(1)+",还要再来一次吗");
+        clearInterval(progressInterval1);
+        clearInterval(progressInterval);
+             handleShouldExit();})
+        .catch(error => console.error('Error:', error));
+                        }
                 var scoreDisplay = document.getElementById("score-display");
                 scoreDisplay.innerText = "Score: " + score.toFixed(1);
                 var fontSize = calculateFontSize(score);
